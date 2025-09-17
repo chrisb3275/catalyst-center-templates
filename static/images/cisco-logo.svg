@@ -1,4 +1,28 @@
 <svg width="120" height="30" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg">
-  <rect width="120" height="30" fill="#1BA0D7"/>
+  <defs>
+    <linearGradient id="ciscoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1BA0D7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0F7BB8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="120" height="30" fill="url(#ciscoGradient)" rx="4"/>
+  
+  <!-- Cisco Bridge Icon -->
+  <g transform="translate(10, 8)">
+    <!-- Bridge structure -->
+    <rect x="0" y="8" width="20" height="2" fill="white" opacity="0.9"/>
+    <rect x="2" y="6" width="16" height="2" fill="white" opacity="0.9"/>
+    <rect x="4" y="4" width="12" height="2" fill="white" opacity="0.9"/>
+    <rect x="6" y="2" width="8" height="2" fill="white" opacity="0.9"/>
+    <rect x="8" y="0" width="4" height="2" fill="white" opacity="0.9"/>
+    
+    <!-- Support pillars -->
+    <rect x="2" y="10" width="1" height="6" fill="white" opacity="0.7"/>
+    <rect x="6" y="10" width="1" height="6" fill="white" opacity="0.7"/>
+    <rect x="10" y="10" width="1" height="6" fill="white" opacity="0.7"/>
+    <rect x="14" y="10" width="1" height="6" fill="white" opacity="0.7"/>
+    <rect x="18" y="10" width="1" height="6" fill="white" opacity="0.7"/>
+  </g>
+  
   <text x="60" y="20" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">Cisco</text>
 </svg>

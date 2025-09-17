@@ -28,11 +28,43 @@
                     <p class="text-muted">{{ templates|length }} templates available</p>
                 </div>
                 
-                <div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary" onclick="toggleBulkMode()">
+                        <i class="fas fa-check-square me-1"></i>Bulk Select
+                    </button>
                     <a href="{{ url_for('api_templates_category', category=category) }}" 
                        class="btn btn-outline-secondary" target="_blank">
                         <i class="fas fa-code me-1"></i>API
                     </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Operations Panel -->
+    <div id="bulkOperationsPanel" class="row mb-4" style="display: none;">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">
+                                <i class="fas fa-check-square me-2"></i>
+                                <span id="selectedCount">0</span> templates selected
+                            </h5>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-light" onclick="selectAllTemplates()">
+                                <i class="fas fa-check-double me-1"></i>Select All
+                            </button>
+                            <button type="button" class="btn btn-light" onclick="clearSelection()">
+                                <i class="fas fa-times me-1"></i>Clear All
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="downloadSelected()">
+                                <i class="fas fa-download me-1"></i>Download Selected
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -45,6 +77,16 @@
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
+                        <!-- Bulk Selection Checkbox -->
+                        <div class="form-check bulk-checkbox" style="display: none;">
+                            <input class="form-check-input" type="checkbox" 
+                                   id="template_{{ loop.index }}" 
+                                   data-template-id="{{ template.category }}:{{ template.filename }}"
+                                   onchange="updateSelection()">
+                            <label class="form-check-label" for="template_{{ loop.index }}">
+                                Select for bulk operations
+                            </label>
+                        </div>
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h5 class="card-title">{{ template.template_name }}</h5>
                             <span class="badge bg-primary">v{{ template.version }}</span>
@@ -171,4 +213,104 @@
         </div>
     </div>
 </div>
+
+<!-- Bulk Operations Script -->
+<script>
+let bulkMode = false;
+
+function toggleBulkMode() {
+    bulkMode = !bulkMode;
+    const checkboxes = document.querySelectorAll('.bulk-checkbox');
+    const panel = document.getElementById('bulkOperationsPanel');
+    const button = document.querySelector('button[onclick="toggleBulkMode()"]');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.style.display = bulkMode ? 'block' : 'none';
+    });
+    
+    panel.style.display = bulkMode ? 'block' : 'none';
+    
+    if (bulkMode) {
+        button.innerHTML = '<i class="fas fa-times me-1"></i>Exit Bulk Mode';
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-outline-danger');
+    } else {
+        button.innerHTML = '<i class="fas fa-check-square me-1"></i>Bulk Select';
+        button.classList.remove('btn-outline-danger');
+        button.classList.add('btn-outline-primary');
+        clearSelection();
+    }
+}
+
+function updateSelection() {
+    const checkboxes = document.querySelectorAll('.bulk-checkbox input[type="checkbox"]:checked');
+    const count = checkboxes.length;
+    document.getElementById('selectedCount').textContent = count;
+}
+
+function selectAllTemplates() {
+    const checkboxes = document.querySelectorAll('.bulk-checkbox input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updateSelection();
+}
+
+function clearSelection() {
+    const checkboxes = document.querySelectorAll('.bulk-checkbox input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateSelection();
+}
+
+function downloadSelected() {
+    const checkboxes = document.querySelectorAll('.bulk-checkbox input[type="checkbox"]:checked');
+    const templateIds = Array.from(checkboxes).map(checkbox => checkbox.dataset.templateId);
+    
+    if (templateIds.length === 0) {
+        alert('Please select at least one template to download.');
+        return;
+    }
+    
+    // Show loading state
+    const button = document.querySelector('button[onclick="downloadSelected()"]');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Preparing Download...';
+    button.disabled = true;
+    
+    fetch('/bulk-download', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ templates: templateIds })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        } else {
+            throw new Error('Download failed');
+        }
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `templates_bulk_${templateIds.length}_files.zip`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Download failed: ' + error.message);
+    })
+    .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+</script>
 {% endblock %}

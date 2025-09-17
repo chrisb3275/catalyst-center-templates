@@ -32,6 +32,75 @@
         </div>
     </div>
 
+    <!-- Advanced Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Advanced Filters
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('search_templates') }}" id="filterForm">
+                        <input type="hidden" name="q" value="{{ query }}">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="">All Categories</option>
+                                    <option value="network" {% if selected_category == 'network' %}selected{% endif %}>Network</option>
+                                    <option value="security" {% if selected_category == 'security' %}selected{% endif %}>Security</option>
+                                    <option value="automation" {% if selected_category == 'automation' %}selected{% endif %}>Automation</option>
+                                    <option value="monitoring" {% if selected_category == 'monitoring' %}selected{% endif %}>Monitoring</option>
+                                    <option value="community" {% if selected_category == 'community' %}selected{% endif %}>Community</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="type" class="form-label">File Type</label>
+                                <select class="form-select" id="type" name="type">
+                                    <option value="">All Types</option>
+                                    <option value="yaml" {% if file_type == 'yaml' %}selected{% endif %}>YAML</option>
+                                    <option value="json" {% if file_type == 'json' %}selected{% endif %}>JSON</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="sort" class="form-label">Sort By</label>
+                                <select class="form-select" id="sort" name="sort">
+                                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name</option>
+                                    <option value="version" {% if sort_by == 'version' %}selected{% endif %}>Version</option>
+                                    <option value="author" {% if sort_by == 'author' %}selected{% endif %}>Author</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="order" class="form-label">Order</label>
+                                <select class="form-select" id="order" name="order">
+                                    <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+                                    <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="author" class="form-label">Author Filter</label>
+                                <input type="text" class="form-control" id="author" name="author" 
+                                       value="{{ author }}" placeholder="Filter by author name">
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search me-1"></i>Apply Filters
+                                </button>
+                                <a href="{{ url_for('search_templates') }}?q={{ query }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo me-1"></i>Clear
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Search Results -->
     <div class="row">
         {% if categories %}

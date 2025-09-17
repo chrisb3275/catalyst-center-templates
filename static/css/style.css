@@ -178,6 +178,124 @@ footer {
     .btn-group .btn:last-child {
         margin-bottom: 0;
     }
+    
+    /* Mobile navigation improvements */
+    .navbar-nav {
+        text-align: center;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .navbar-nav .nav-link:last-child {
+        border-bottom: none;
+    }
+    
+    /* Mobile search bar */
+    .navbar .d-flex {
+        margin: 0.5rem 0;
+    }
+    
+    .navbar .input-group {
+        width: 100%;
+    }
+    
+    /* Mobile cards */
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    /* Mobile tables */
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+    
+    /* Mobile modals */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .modal-content {
+        border-radius: 0.5rem;
+    }
+    
+    /* Mobile forms */
+    .form-control, .form-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Mobile buttons */
+    .btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Mobile spacing */
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    /* Mobile bulk operations */
+    .bulk-checkbox {
+        margin-bottom: 1rem;
+    }
+    
+    #bulkOperationsPanel .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    #bulkOperationsPanel .btn-group .btn {
+        margin-bottom: 0.5rem;
+        width: 100%;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 576px) {
+    .jumbotron h1 {
+        font-size: 1.5rem;
+    }
+    
+    .jumbotron p {
+        font-size: 0.9rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .badge {
+        font-size: 0.7em;
+    }
+    
+    .table {
+        font-size: 0.75rem;
+    }
+    
+    .modal-dialog {
+        margin: 0.25rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .navbar-brand img {
+        height: 20px;
+    }
 }
 
 /* Custom scrollbar */

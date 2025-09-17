@@ -292,11 +292,15 @@ def preview_template(category, template_name):
 
 @app.route('/search')
 def search_templates():
-    """Search templates by name, description, or tags."""
+    """Search templates by name, description, or tags with advanced filters."""
     query = request.args.get('q', '').strip().lower()
     category = request.args.get('category', '')
+    sort_by = request.args.get('sort', 'name')  # name, version, author, date
+    sort_order = request.args.get('order', 'asc')  # asc, desc
+    file_type = request.args.get('type', '')  # yaml, json
+    author = request.args.get('author', '').strip().lower()
     
-    if not query:
+    if not query and not category and not file_type and not author:
         return redirect(url_for('index'))
     
     # Get all templates
@@ -306,19 +310,42 @@ def search_templates():
             templates = get_templates_by_category(cat)
             all_templates.extend(templates)
     
-    # Filter templates based on search query
+    # Filter templates based on search criteria
     filtered_templates = []
     for template in all_templates:
-        searchable_text = ' '.join([
-            template.get('template_name', ''),
-            template.get('template_description', ''),
-            ' '.join(template.get('tags', [])),
-            template.get('author', ''),
-            ' '.join(template.get('device_types', []))
-        ]).lower()
+        # Text search
+        if query:
+            searchable_text = ' '.join([
+                template.get('template_name', ''),
+                template.get('template_description', ''),
+                ' '.join(template.get('tags', [])),
+                template.get('author', ''),
+                ' '.join(template.get('device_types', []))
+            ]).lower()
+            
+            if query not in searchable_text:
+                continue
         
-        if query in searchable_text:
-            filtered_templates.append(template)
+        # File type filter
+        if file_type and template.get('file_type', '') != file_type:
+            continue
+            
+        # Author filter
+        if author and author not in template.get('author', '').lower():
+            continue
+            
+        filtered_templates.append(template)
+    
+    # Sort templates
+    if sort_by == 'name':
+        filtered_templates.sort(key=lambda x: x.get('template_name', '').lower(), 
+                              reverse=(sort_order == 'desc'))
+    elif sort_by == 'version':
+        filtered_templates.sort(key=lambda x: x.get('version', '0'), 
+                              reverse=(sort_order == 'desc'))
+    elif sort_by == 'author':
+        filtered_templates.sort(key=lambda x: x.get('author', '').lower(), 
+                              reverse=(sort_order == 'desc'))
     
     # Group by category for display
     categories = {}
@@ -331,7 +358,66 @@ def search_templates():
     return render_template('search_results.html', 
                          query=query, 
                          categories=categories,
-                         total_results=len(filtered_templates))
+                         total_results=len(filtered_templates),
+                         sort_by=sort_by,
+                         sort_order=sort_order,
+                         file_type=file_type,
+                         author=author,
+                         selected_category=category)
+
+@app.route('/bulk-download', methods=['POST'])
+def bulk_download():
+    """Download multiple templates as a ZIP file."""
+    try:
+        import zipfile
+        import io
+        
+        data = request.get_json()
+        template_ids = data.get('templates', [])
+        
+        if not template_ids:
+            return jsonify({'error': 'No templates selected'}), 400
+        
+        # Create ZIP file in memory
+        zip_buffer = io.BytesIO()
+        
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for template_id in template_ids:
+                # Parse template_id (format: "category:filename")
+                if ':' not in template_id:
+                    continue
+                    
+                category, filename = template_id.split(':', 1)
+                
+                if category not in TEMPLATE_DIRS:
+                    continue
+                
+                # Try YAML first, then JSON
+                yaml_path = Path(TEMPLATE_DIRS[category]) / f"{filename}.yaml"
+                json_path = Path(TEMPLATE_DIRS[category]) / f"{filename}.json"
+                
+                template_path = None
+                if yaml_path.exists():
+                    template_path = yaml_path
+                elif json_path.exists():
+                    template_path = json_path
+                
+                if template_path:
+                    # Add file to ZIP
+                    zip_file.write(template_path, f"{category}/{template_path.name}")
+        
+        zip_buffer.seek(0)
+        
+        return send_file(
+            io.BytesIO(zip_buffer.getvalue()),
+            as_attachment=True,
+            download_name=f"templates_bulk_{len(template_ids)}_files.zip",
+            mimetype='application/zip'
+        )
+        
+    except Exception as e:
+        logger.error(f"Error in bulk download: {e}")
+        return jsonify({'error': 'Bulk download failed'}), 500
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_template():

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ category|title }} Templates - Automation-X AT&T CONNEXUS{% endblock %}
+{% block title %}{{ category|title }} Templates - Automation-X Catalyst Center - AT&T{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -107,6 +107,33 @@
             </div>
         {% endif %}
     </div>
+
+    <!-- Pagination -->
+    {% if templates and templates|length > 12 %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Templates pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <span class="page-link">Previous</span>
+                    </li>
+                    <li class="page-item active">
+                        <span class="page-link">1</span>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Category Description -->
     <div class="row mt-5">

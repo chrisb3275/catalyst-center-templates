@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Template - Automation-X Catalyst Center - AT&T{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Upload Template</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-upload me-2"></i>Upload Template</h1>
+                    <p class="text-muted">Upload a new template file to the repository</p>
+                </div>
+                
+                <div>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-upload me-2"></i>Template Upload
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Template File <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="file" name="file" 
+                                   accept=".yaml,.yml,.json" required>
+                            <div class="form-text">
+                                Supported formats: YAML (.yaml, .yml) and JSON (.json)
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="network">Network Templates</option>
+                                <option value="security">Security Templates</option>
+                                <option value="automation">Automation Templates</option>
+                                <option value="monitoring">Monitoring Templates</option>
+                                <option value="community" selected>Community Templates</option>
+                            </select>
+                            <div class="form-text">
+                                Choose the appropriate category for your template
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="3" placeholder="Brief description of the template..."></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-outline-secondary me-md-2" onclick="resetForm()">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-1"></i>Upload Template
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Guidelines -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle me-2"></i>Upload Guidelines
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>File Requirements:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>YAML or JSON format</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Maximum file size: 16MB</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Valid template structure</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Descriptive filename</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Template Structure:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-info text-info me-2"></i>template_name: Template name</li>
+                                <li><i class="fas fa-info text-info me-2"></i>template_description: Description</li>
+                                <li><i class="fas fa-info text-info me-2"></i>configuration: Template content</li>
+                                <li><i class="fas fa-info text-info me-2"></i>parameters: Template parameters</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Result Modal -->
+    <div class="modal fade" id="uploadResultModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadResultTitle">Upload Result</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="uploadResultBody">
+                    <!-- Result content will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="viewTemplateBtn" style="display: none;">
+                        <i class="fas fa-eye me-1"></i>View Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Uploading...';
+    submitBtn.disabled = true;
+    
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showUploadResult(true, data.message, data.filename, data.category);
+            resetForm();
+        } else {
+            showUploadResult(false, data.error);
+        }
+    })
+    .catch(error => {
+        showUploadResult(false, 'Upload failed: ' + error.message);
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+
+function resetForm() {
+    document.getElementById('uploadForm').reset();
+}
+
+function showUploadResult(success, message, filename = null, category = null) {
+    const modal = new bootstrap.Modal(document.getElementById('uploadResultModal'));
+    const title = document.getElementById('uploadResultTitle');
+    const body = document.getElementById('uploadResultBody');
+    const viewBtn = document.getElementById('viewTemplateBtn');
+    
+    if (success) {
+        title.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i>Upload Successful';
+        body.innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>${message}
+            </div>
+            ${filename ? `<p><strong>File:</strong> ${filename}</p>` : ''}
+            ${category ? `<p><strong>Category:</strong> ${category}</p>` : ''}
+        `;
+        
+        if (filename && category) {
+            viewBtn.style.display = 'inline-block';
+            viewBtn.onclick = () => {
+                window.location.href = `/templates/${category}/${filename.replace(/\.[^/.]+$/, '')}`;
+            };
+        } else {
+            viewBtn.style.display = 'none';
+        }
+    } else {
+        title.innerHTML = '<i class="fas fa-exclamation-triangle text-danger me-2"></i>Upload Failed';
+        body.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>${message}
+            </div>
+        `;
+        viewBtn.style.display = 'none';
+    }
+    
+    modal.show();
+}
+</script>
+{% endblock %}

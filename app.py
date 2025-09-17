@@ -244,6 +244,89 @@ def download_template(category, template_name):
     return send_file(template_path, as_attachment=True, 
                     download_name=f"{template_name}{template_path.suffix}")
 
+@app.route('/search')
+def search_templates():
+    """Search templates by name, description, or tags."""
+    query = request.args.get('q', '').strip().lower()
+    category = request.args.get('category', '')
+    
+    if not query:
+        return redirect(url_for('index'))
+    
+    # Get all templates
+    all_templates = []
+    for cat in TEMPLATE_DIRS.keys():
+        if not category or cat == category:
+            templates = get_templates_by_category(cat)
+            all_templates.extend(templates)
+    
+    # Filter templates based on search query
+    filtered_templates = []
+    for template in all_templates:
+        searchable_text = ' '.join([
+            template.get('template_name', ''),
+            template.get('template_description', ''),
+            ' '.join(template.get('tags', [])),
+            template.get('author', ''),
+            ' '.join(template.get('device_types', []))
+        ]).lower()
+        
+        if query in searchable_text:
+            filtered_templates.append(template)
+    
+    # Group by category for display
+    categories = {}
+    for template in filtered_templates:
+        cat = template.get('category', 'unknown')
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(template)
+    
+    return render_template('search_results.html', 
+                         query=query, 
+                         categories=categories,
+                         total_results=len(filtered_templates))
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_template():
+    """Upload a new template file."""
+    if request.method == 'GET':
+        return render_template('upload.html')
+    
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['file']
+    category = request.form.get('category', 'community')
+    
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    if category not in TEMPLATE_DIRS:
+        return jsonify({'error': 'Invalid category'}), 400
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        upload_dir = Path(TEMPLATE_DIRS[category])
+        upload_dir.mkdir(parents=True, exist_ok=True)
+        
+        file_path = upload_dir / filename
+        file.save(file_path)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Template uploaded successfully to {category} category',
+            'filename': filename,
+            'category': category
+        })
+    
+    return jsonify({'error': 'Invalid file type'}), 400
+
+def allowed_file(filename):
+    """Check if file extension is allowed."""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in {'yaml', 'yml', 'json'}
+
 @app.route('/health')
 def health_check():
     """Health check endpoint."""

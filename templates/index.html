@@ -115,6 +115,60 @@
         {% endfor %}
     </div>
 
+    <!-- Dashboard Metrics -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-chart-bar me-2"></i>
+                Dashboard Metrics
+            </h3>
+        </div>
+        
+        <!-- Total Templates -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-file-code fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title">{{ categories.values() | map(attribute='count') | sum }}</h4>
+                    <p class="card-text text-muted">Total Templates</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Categories Count -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-th-large fa-3x text-success mb-3"></i>
+                    <h4 class="card-title">{{ categories|length }}</h4>
+                    <p class="card-text text-muted">Categories</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Community Templates -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-3x text-warning mb-3"></i>
+                    <h4 class="card-title">{{ categories.community.count if categories.community else 0 }}</h4>
+                    <p class="card-text text-muted">Community Templates</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                    <h4 class="card-title">{{ (categories.values() | map(attribute='templates') | map('length') | sum) if categories else 0 }}</h4>
+                    <p class="card-text text-muted">Recent Templates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- API Information -->
     <div class="row mt-5">
         <div class="col-12">
@@ -134,6 +188,8 @@
                                 <li><code>GET /api/templates</code> - All templates</li>
                                 <li><code>GET /api/templates/{category}</code> - Templates by category</li>
                                 <li><code>POST /render</code> - Render template with parameters</li>
+                                <li><code>POST /upload</code> - Upload new template</li>
+                                <li><code>GET /search?q=query</code> - Search templates</li>
                                 <li><code>GET /health</code> - Health check</li>
                             </ul>
                         </div>

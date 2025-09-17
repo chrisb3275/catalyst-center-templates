@@ -38,17 +38,46 @@ def load_template(template_path):
         logger.error(f"Error loading template {template_path}: {e}")
         return None
 
+def load_json_template(template_path):
+    """Load a JSON template file."""
+    try:
+        with open(template_path, 'r') as file:
+            data = json.load(file)
+            # Convert JSON to a standard template format
+            return {
+                'name': data.get('name', Path(template_path).stem),
+                'description': data.get('description', 'Community template'),
+                'configuration': data.get('configuration', []),
+                'parameters': data.get('parameters', {}),
+                'tags': data.get('tags', ['community']),
+                'author': data.get('author', 'Community'),
+                'version': data.get('version', '1.0')
+            }
+    except Exception as e:
+        logger.error(f"Error loading JSON template {template_path}: {e}")
+        return None
+
 def get_templates_by_category(category):
     """Get all templates in a specific category."""
     templates = []
     template_dir = Path(TEMPLATE_DIRS.get(category, ''))
     
     if template_dir.exists():
+        # Look for both YAML and JSON files
         for file_path in template_dir.glob('*.yaml'):
             template = load_template(file_path)
             if template:
                 template['file_path'] = str(file_path)
                 template['category'] = category
+                template['file_type'] = 'yaml'
+                templates.append(template)
+        
+        for file_path in template_dir.glob('*.json'):
+            template = load_json_template(file_path)
+            if template:
+                template['file_path'] = str(file_path)
+                template['category'] = category
+                template['file_type'] = 'json'
                 templates.append(template)
     
     return templates
@@ -91,17 +120,26 @@ def templates_category(category):
 @app.route('/template/<category>/<template_name>')
 def template_detail(category, template_name):
     """Show detailed view of a specific template."""
-    template_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.yaml"
+    # Try YAML first, then JSON
+    yaml_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.yaml"
+    json_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.json"
     
-    if not template_path.exists():
-        return "Template not found", 404
+    template = None
+    template_path = None
     
-    template = load_template(template_path)
+    if yaml_path.exists():
+        template_path = yaml_path
+        template = load_template(template_path)
+    elif json_path.exists():
+        template_path = json_path
+        template = load_json_template(template_path)
+    
     if not template:
-        return "Error loading template", 500
+        return "Template not found", 404
     
     template['file_path'] = str(template_path)
     template['category'] = category
+    template['file_type'] = template_path.suffix[1:]  # Remove the dot
     
     return render_template('template_detail.html', template=template)
 
@@ -154,13 +192,21 @@ def api_templates_category(category):
 @app.route('/download/<category>/<template_name>')
 def download_template(category, template_name):
     """Download a template file."""
-    template_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.yaml"
+    # Try YAML first, then JSON
+    yaml_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.yaml"
+    json_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.json"
     
-    if not template_path.exists():
+    template_path = None
+    if yaml_path.exists():
+        template_path = yaml_path
+    elif json_path.exists():
+        template_path = json_path
+    
+    if not template_path:
         return "Template not found", 404
     
     return send_file(template_path, as_attachment=True, 
-                    download_name=f"{template_name}.yaml")
+                    download_name=f"{template_name}{template_path.suffix}")
 
 @app.route('/health')
 def health_check():

@@ -1,0 +1,69 @@
+# Access Control List Template
+# This template provides common ACL configurations for network security
+
+template_name: "Standard Access Control Lists"
+template_description: "Common ACL configurations for network security"
+template_type: "security"
+version: "1.0"
+
+parameters:
+  - name: "management_network"
+    type: "string"
+    description: "Management network subnet"
+    required: true
+    default: "192.168.1.0"
+  
+  - name: "management_mask"
+    type: "string"
+    description: "Management network mask"
+    required: true
+    default: "0.0.0.255"
+  
+  - name: "server_network"
+    type: "string"
+    description: "Server network subnet"
+    required: true
+    default: "10.0.1.0"
+  
+  - name: "server_mask"
+    type: "string"
+    description: "Server network mask"
+    required: true
+    default: "0.0.0.255"
+
+configuration:
+  - "! Standard Access Control Lists"
+  - "!"
+  - "! Management Access Control List"
+  - "access-list 10 permit {{ management_network }} {{ management_mask }}"
+  - "access-list 10 deny any"
+  - "!"
+  - "! Server Access Control List"
+  - "access-list 20 permit {{ server_network }} {{ server_mask }}"
+  - "access-list 20 permit {{ management_network }} {{ management_mask }}"
+  - "access-list 20 deny any"
+  - "!"
+  - "! Extended Access Control Lists"
+  - "!"
+  - "! Allow SSH from management network"
+  - "access-list 100 permit tcp {{ management_network }} {{ management_mask }} any eq 22"
+  - "!"
+  - "! Allow HTTP/HTTPS from management network"
+  - "access-list 100 permit tcp {{ management_network }} {{ management_mask }} any eq 80"
+  - "access-list 100 permit tcp {{ management_network }} {{ management_mask }} any eq 443"
+  - "!"
+  - "! Allow SNMP from management network"
+  - "access-list 100 permit udp {{ management_network }} {{ management_mask }} any eq 161"
+  - "access-list 100 permit udp {{ management_network }} {{ management_mask }} any eq 162"
+  - "!"
+  - "! Allow ICMP from management network"
+  - "access-list 100 permit icmp {{ management_network }} {{ management_mask }} any"
+  - "!"
+  - "! Deny all other traffic"
+  - "access-list 100 deny ip any any"
+  - "!"
+  - "! Apply ACLs to interfaces"
+  - "! interface vlan 99"
+  - "!   ip access-group 10 in"
+  - "! interface gigabitethernet0/0"
+  - "!   ip access-group 100 in"

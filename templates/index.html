@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Catalyst Center Templates{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="jumbotron bg-primary text-white p-5 rounded">
+                <h1 class="display-4">
+                    <i class="fas fa-network-wired me-3"></i>
+                    Catalyst Center Templates
+                </h1>
+                <p class="lead">
+                    A comprehensive collection of templates and automation scripts for Cisco Catalyst Center (DNA Center).
+                    Manage, deploy, and customize network configurations with ease.
+                </p>
+                <hr class="my-4">
+                <p>Get started by exploring our template categories or use our API for programmatic access.</p>
+                <a class="btn btn-light btn-lg" href="#templates" role="button">
+                    <i class="fas fa-rocket me-2"></i>Explore Templates
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Categories -->
+    <div id="templates" class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-th-large me-2"></i>
+                Template Categories
+            </h2>
+        </div>
+        
+        {% for category, info in categories.items() %}
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if category == 'network' %}
+                            <i class="fas fa-network-wired fa-2x text-primary me-3"></i>
+                        {% elif category == 'security' %}
+                            <i class="fas fa-shield-alt fa-2x text-success me-3"></i>
+                        {% elif category == 'automation' %}
+                            <i class="fas fa-robot fa-2x text-warning me-3"></i>
+                        {% elif category == 'monitoring' %}
+                            <i class="fas fa-chart-line fa-2x text-info me-3"></i>
+                        {% endif %}
+                        <div>
+                            <h5 class="card-title text-capitalize mb-0">{{ category }}</h5>
+                            <small class="text-muted">{{ info.count }} templates</small>
+                        </div>
+                    </div>
+                    
+                    <p class="card-text">
+                        {% if category == 'network' %}
+                            Network configuration templates for switches, routers, and access points.
+                        {% elif category == 'security' %}
+                            Security policies, ACLs, and access control configurations.
+                        {% elif category == 'automation' %}
+                            Automated workflows and device provisioning templates.
+                        {% elif category == 'monitoring' %}
+                            Network monitoring, alerting, and health check configurations.
+                        {% endif %}
+                    </p>
+                    
+                    <div class="mt-auto">
+                        <a href="{{ url_for('templates_category', category=category) }}" 
+                           class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye me-1"></i>View All
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Recent Templates -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">
+                <i class="fas fa-clock me-2"></i>
+                Recent Templates
+            </h3>
+        </div>
+        
+        {% for category, info in categories.items() %}
+            {% for template in info.templates %}
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title mb-0">{{ template.template_name }}</h6>
+                            <span class="badge bg-secondary text-capitalize">{{ category }}</span>
+                        </div>
+                        <p class="card-text small text-muted">{{ template.template_description[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">v{{ template.version }}</small>
+                            <a href="{{ url_for('template_detail', category=category, template_name=template.template_name|lower|replace(' ', '_')) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-external-link-alt me-1"></i>View
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <!-- API Information -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        <i class="fas fa-code me-2"></i>
+                        API Access
+                    </h4>
+                    <p class="card-text">
+                        Access all templates programmatically through our REST API. Perfect for automation and integration with your existing tools.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Available Endpoints:</h6>
+                            <ul class="list-unstyled">
+                                <li><code>GET /api/templates</code> - All templates</li>
+                                <li><code>GET /api/templates/{category}</code> - Templates by category</li>
+                                <li><code>POST /render</code> - Render template with parameters</li>
+                                <li><code>GET /health</code> - Health check</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Quick Start:</h6>
+                            <pre class="bg-dark text-light p-2 rounded"><code>curl {{ request.url_root }}api/templates</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

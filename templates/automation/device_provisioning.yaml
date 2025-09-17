@@ -1,0 +1,100 @@
+# Device Provisioning Automation Template
+# This template automates the provisioning of new devices
+
+template_name: "Device Provisioning Automation"
+template_description: "Automated workflow for provisioning new network devices"
+template_type: "automation"
+version: "1.0"
+
+workflow:
+  name: "Device Provisioning"
+  description: "Complete device provisioning workflow"
+  steps:
+    - name: "Device Discovery"
+      type: "api_call"
+      endpoint: "/dna/intent/api/v1/network-device"
+      method: "GET"
+      description: "Discover and inventory new devices"
+    
+    - name: "Site Assignment"
+      type: "api_call"
+      endpoint: "/dna/intent/api/v1/site"
+      method: "POST"
+      description: "Assign device to appropriate site"
+      parameters:
+        site_name: "{{ site_name }}"
+        device_serial: "{{ device_serial }}"
+    
+    - name: "Template Selection"
+      type: "conditional"
+      condition: "{{ device_type }}"
+      cases:
+        switch: "basic_switch_config"
+        router: "basic_router_config"
+        access_point: "basic_ap_config"
+    
+    - name: "Configuration Deployment"
+      type: "api_call"
+      endpoint: "/dna/intent/api/v1/template-programmer/template/deploy"
+      method: "POST"
+      description: "Deploy configuration template"
+      parameters:
+        template_id: "{{ selected_template_id }}"
+        target_devices: "{{ device_list }}"
+        params: "{{ template_parameters }}"
+    
+    - name: "Verification"
+      type: "api_call"
+      endpoint: "/dna/intent/api/v1/network-device/{{ device_id }}/config"
+      method: "GET"
+      description: "Verify configuration deployment"
+    
+    - name: "Monitoring Setup"
+      type: "api_call"
+      endpoint: "/dna/intent/api/v1/assurance/health"
+      method: "POST"
+      description: "Enable monitoring for the device"
+
+parameters:
+  - name: "device_serial"
+    type: "string"
+    description: "Serial number of the device to provision"
+    required: true
+  
+  - name: "site_name"
+    type: "string"
+    description: "Site name for device assignment"
+    required: true
+    default: "Default Site"
+  
+  - name: "device_type"
+    type: "string"
+    description: "Type of device (switch, router, access_point)"
+    required: true
+    options: ["switch", "router", "access_point"]
+  
+  - name: "template_parameters"
+    type: "object"
+    description: "Parameters for the selected template"
+    required: false
+    default: {}
+
+triggers:
+  - name: "New Device Detected"
+    type: "webhook"
+    endpoint: "/api/v1/triggers/new-device"
+    description: "Triggered when a new device is detected"
+  
+  - name: "Manual Provisioning"
+    type: "manual"
+    description: "Manual trigger for device provisioning"
+
+notifications:
+  - type: "email"
+    recipients: ["admin@example.com"]
+    template: "device_provisioned"
+    conditions: ["success", "failure"]
+  
+  - type: "webhook"
+    url: "https://your-webhook-url.com/notifications"
+    conditions: ["success", "failure"]

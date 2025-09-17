@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}{{ template.template_name }} - Catalyst Center Templates{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('templates_category', category=template.category) }}">{{ template.category|title }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ template.template_name }}</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1>{{ template.template_name }}</h1>
+                    <p class="text-muted">{{ template.template_description }}</p>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-primary me-2">v{{ template.version }}</span>
+                        <span class="badge bg-secondary me-2">{{ template.template_type|title }}</span>
+                        <span class="badge bg-info">{{ template.category|title }}</span>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <a href="{{ url_for('download_template', category=template.category, template_name=template.template_name|lower|replace(' ', '_')) }}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-download me-1"></i>Download
+                    </a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renderModal">
+                        <i class="fas fa-play me-1"></i>Render Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Template Information -->
+        <div class="col-lg-8">
+            <!-- Parameters Section -->
+            {% if template.parameters %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>Template Parameters
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Required</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for param in template.parameters %}
+                                <tr>
+                                    <td><code>{{ param.name }}</code></td>
+                                    <td><span class="badge bg-info">{{ param.type }}</span></td>
+                                    <td>
+                                        {% if param.required %}
+                                            <i class="fas fa-check text-success"></i>
+                                        {% else %}
+                                            <i class="fas fa-times text-muted"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if param.default %}
+                                            <code>{{ param.default }}</code>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ param.description }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Configuration Preview -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-code me-2"></i>Configuration Template
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-dark text-light p-3 rounded"><code>{% for line in template.configuration %}{{ line }}
+{% endfor %}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#renderModal">
+                            <i class="fas fa-play me-1"></i>Render with Parameters
+                        </button>
+                        <a href="{{ url_for('download_template', category=template.category, template_name=template.template_name|lower|replace(' ', '_')) }}" 
+                           class="btn btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Download Template
+                        </a>
+                        <button type="button" class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                            <i class="fas fa-copy me-1"></i>Copy Configuration
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Template Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Template Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Name:</dt>
+                        <dd class="col-sm-8">{{ template.template_name }}</dd>
+                        
+                        <dt class="col-sm-4">Version:</dt>
+                        <dd class="col-sm-8">{{ template.version }}</dd>
+                        
+                        <dt class="col-sm-4">Type:</dt>
+                        <dd class="col-sm-8">{{ template.template_type|title }}</dd>
+                        
+                        <dt class="col-sm-4">Category:</dt>
+                        <dd class="col-sm-8">{{ template.category|title }}</dd>
+                        
+                        <dt class="col-sm-4">Parameters:</dt>
+                        <dd class="col-sm-8">{{ template.parameters|length if template.parameters else 0 }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- API Usage -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-code me-2"></i>API Usage
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">Use this template via API:</p>
+                    <pre class="bg-light p-2 rounded small"><code>POST /render
+{
+  "template_name": "{{ template.template_name|lower|replace(' ', '_') }}",
+  "category": "{{ template.category }}",
+  "parameters": {
+    // Your parameters here
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Render Modal -->
+<div class="modal fade" id="renderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Render Template</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="renderForm">
+                    <div class="mb-3">
+                        <label class="form-label">Template Parameters</label>
+                        <div id="parametersForm">
+                            {% if template.parameters %}
+                                {% for param in template.parameters %}
+                                <div class="mb-3">
+                                    <label for="param_{{ param.name }}" class="form-label">
+                                        {{ param.name }}
+                                        {% if param.required %}<span class="text-danger">*</span>{% endif %}
+                                        <small class="text-muted">({{ param.type }})</small>
+                                    </label>
+                                    {% if param.type == 'string' %}
+                                        <input type="text" class="form-control" id="param_{{ param.name }}" 
+                                               name="{{ param.name }}" value="{{ param.default or '' }}"
+                                               {% if param.required %}required{% endif %}>
+                                    {% elif param.type == 'integer' %}
+                                        <input type="number" class="form-control" id="param_{{ param.name }}" 
+                                               name="{{ param.name }}" value="{{ param.default or '' }}"
+                                               {% if param.required %}required{% endif %}>
+                                    {% elif param.type == 'boolean' %}
+                                        <select class="form-select" id="param_{{ param.name }}" name="{{ param.name }}">
+                                            <option value="true" {% if param.default == true %}selected{% endif %}>True</option>
+                                            <option value="false" {% if param.default == false %}selected{% endif %}>False</option>
+                                        </select>
+                                    {% else %}
+                                        <input type="text" class="form-control" id="param_{{ param.name }}" 
+                                               name="{{ param.name }}" value="{{ param.default or '' }}"
+                                               {% if param.required %}required{% endif %}>
+                                    {% endif %}
+                                    <div class="form-text">{{ param.description }}</div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">No parameters required for this template.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+                
+                <div id="renderResult" class="mt-4" style="display: none;">
+                    <h6>Rendered Configuration:</h6>
+                    <pre class="bg-dark text-light p-3 rounded"><code id="renderedConfig"></code></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="renderTemplate()">Render</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function copyToClipboard() {
+    const config = `{% for line in template.configuration %}{{ line }}
+{% endfor %}`;
+    navigator.clipboard.writeText(config).then(() => {
+        // Show success message
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check me-1"></i>Copied!';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-outline-secondary');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-secondary');
+        }, 2000);
+    });
+}
+
+function renderTemplate() {
+    const form = document.getElementById('renderForm');
+    const formData = new FormData(form);
+    const parameters = {};
+    
+    for (let [key, value] of formData.entries()) {
+        parameters[key] = value;
+    }
+    
+    const requestData = {
+        template_name: '{{ template.template_name|lower|replace(" ", "_") }}',
+        category: '{{ template.category }}',
+        parameters: parameters
+    };
+    
+    fetch('/render', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('renderedConfig').textContent = data.rendered_config;
+            document.getElementById('renderResult').style.display = 'block';
+        } else {
+            alert('Error rendering template: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error rendering template: ' + error);
+    });
+}
+</script>
+{% endblock %}

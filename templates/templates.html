@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category|title }} Templates - Catalyst Center Templates{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ category|title }} Templates</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    {% if category == 'network' %}
+                        <h1><i class="fas fa-network-wired me-2 text-primary"></i>Network Templates</h1>
+                    {% elif category == 'security' %}
+                        <h1><i class="fas fa-shield-alt me-2 text-success"></i>Security Templates</h1>
+                    {% elif category == 'automation' %}
+                        <h1><i class="fas fa-robot me-2 text-warning"></i>Automation Templates</h1>
+                    {% elif category == 'monitoring' %}
+                        <h1><i class="fas fa-chart-line me-2 text-info"></i>Monitoring Templates</h1>
+                    {% endif %}
+                    <p class="text-muted">{{ templates|length }} templates available</p>
+                </div>
+                
+                <div>
+                    <a href="{{ url_for('api_templates_category', category=category) }}" 
+                       class="btn btn-outline-secondary" target="_blank">
+                        <i class="fas fa-code me-1"></i>API
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="row">
+        {% if templates %}
+            {% for template in templates %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="card-title">{{ template.template_name }}</h5>
+                            <span class="badge bg-primary">v{{ template.version }}</span>
+                        </div>
+                        
+                        <p class="card-text text-muted">{{ template.template_description }}</p>
+                        
+                        <!-- Parameters -->
+                        {% if template.parameters %}
+                        <div class="mb-3">
+                            <h6 class="text-muted small">Parameters:</h6>
+                            <div class="row">
+                                {% for param in template.parameters[:3] %}
+                                <div class="col-12">
+                                    <small class="text-muted">
+                                        <strong>{{ param.name }}</strong> 
+                                        ({{ param.type }})
+                                        {% if param.required %}<span class="text-danger">*</span>{% endif %}
+                                    </small>
+                                </div>
+                                {% endfor %}
+                                {% if template.parameters|length > 3 %}
+                                <div class="col-12">
+                                    <small class="text-muted">+{{ template.parameters|length - 3 }} more...</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <a href="{{ url_for('template_detail', category=category, template_name=template.template_name|lower|replace(' ', '_')) }}" 
+                                   class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </a>
+                            </div>
+                            <div>
+                                <a href="{{ url_for('download_template', category=category, template_name=template.template_name|lower|replace(' ', '_')) }}" 
+                                   class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-file-code fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No templates found</h4>
+                    <p class="text-muted">No {{ category }} templates are currently available.</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Category Description -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {% if category == 'network' %}
+                            <i class="fas fa-info-circle me-2"></i>About Network Templates
+                        {% elif category == 'security' %}
+                            <i class="fas fa-info-circle me-2"></i>About Security Templates
+                        {% elif category == 'automation' %}
+                            <i class="fas fa-info-circle me-2"></i>About Automation Templates
+                        {% elif category == 'monitoring' %}
+                            <i class="fas fa-info-circle me-2"></i>About Monitoring Templates
+                        {% endif %}
+                    </h5>
+                    <p class="card-text">
+                        {% if category == 'network' %}
+                            Network templates provide pre-configured settings for Cisco switches, routers, and access points. 
+                            These templates include basic configurations like VLAN setup, management interfaces, SSH, SNMP, and security settings.
+                        {% elif category == 'security' %}
+                            Security templates contain access control lists, port security configurations, and authentication settings 
+                            to help secure your network infrastructure and enforce security policies.
+                        {% elif category == 'automation' %}
+                            Automation templates define workflows and processes for device provisioning, configuration management, 
+                            and compliance checking to streamline network operations.
+                        {% elif category == 'monitoring' %}
+                            Monitoring templates configure network health checks, performance monitoring, alerting, and reporting 
+                            to ensure optimal network performance and quick issue detection.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

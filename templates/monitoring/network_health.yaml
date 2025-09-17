@@ -1,0 +1,164 @@
+# Network Health Monitoring Template
+# This template configures comprehensive network monitoring
+
+template_name: "Network Health Monitoring"
+template_description: "Comprehensive network health monitoring configuration"
+template_type: "monitoring"
+version: "1.0"
+
+monitoring_config:
+  health_checks:
+    - name: "Device Availability"
+      type: "ping"
+      interval: 60
+      timeout: 5
+      threshold: 3
+      description: "Monitor device reachability"
+    
+    - name: "CPU Utilization"
+      type: "snmp"
+      oid: "1.3.6.1.4.1.9.9.109.1.1.1.1.5"
+      interval: 300
+      threshold: 80
+      description: "Monitor CPU usage"
+    
+    - name: "Memory Utilization"
+      type: "snmp"
+      oid: "1.3.6.1.4.1.9.9.48.1.1.1.5"
+      interval: 300
+      threshold: 85
+      description: "Monitor memory usage"
+    
+    - name: "Interface Status"
+      type: "snmp"
+      oid: "1.3.6.1.2.1.2.2.1.8"
+      interval: 60
+      description: "Monitor interface up/down status"
+    
+    - name: "Interface Utilization"
+      type: "snmp"
+      oid: "1.3.6.1.2.1.2.2.1.10"
+      interval: 300
+      threshold: 80
+      description: "Monitor interface bandwidth utilization"
+
+  alerts:
+    - name: "Device Down"
+      condition: "Device Availability == false"
+      severity: "critical"
+      notification: ["email", "webhook"]
+      description: "Device is not responding to ping"
+    
+    - name: "High CPU Usage"
+      condition: "CPU Utilization > 80"
+      severity: "warning"
+      notification: ["email"]
+      description: "CPU utilization is above threshold"
+    
+    - name: "High Memory Usage"
+      condition: "Memory Utilization > 85"
+      severity: "warning"
+      notification: ["email"]
+      description: "Memory utilization is above threshold"
+    
+    - name: "Interface Down"
+      condition: "Interface Status == down"
+      severity: "critical"
+      notification: ["email", "webhook"]
+      description: "Network interface is down"
+    
+    - name: "High Interface Utilization"
+      condition: "Interface Utilization > 80"
+      severity: "warning"
+      notification: ["email"]
+      description: "Interface bandwidth utilization is high"
+
+  dashboards:
+    - name: "Network Overview"
+      widgets:
+        - type: "device_status"
+          title: "Device Status"
+          position: [0, 0]
+          size: [6, 4]
+        
+        - type: "cpu_utilization"
+          title: "CPU Utilization"
+          position: [6, 0]
+          size: [6, 4]
+        
+        - type: "memory_utilization"
+          title: "Memory Utilization"
+          position: [0, 4]
+          size: [6, 4]
+        
+        - type: "interface_status"
+          title: "Interface Status"
+          position: [6, 4]
+          size: [6, 4]
+    
+    - name: "Performance Metrics"
+      widgets:
+        - type: "bandwidth_utilization"
+          title: "Bandwidth Utilization"
+          position: [0, 0]
+          size: [12, 6]
+        
+        - type: "packet_loss"
+          title: "Packet Loss"
+          position: [0, 6]
+          size: [6, 4]
+        
+        - type: "latency"
+          title: "Network Latency"
+          position: [6, 6]
+          size: [6, 4]
+
+parameters:
+  - name: "monitoring_interval"
+    type: "integer"
+    description: "Default monitoring interval in seconds"
+    required: false
+    default: 300
+  
+  - name: "alert_threshold_cpu"
+    type: "integer"
+    description: "CPU utilization alert threshold percentage"
+    required: false
+    default: 80
+  
+  - name: "alert_threshold_memory"
+    type: "integer"
+    description: "Memory utilization alert threshold percentage"
+    required: false
+    default: 85
+  
+  - name: "alert_threshold_bandwidth"
+    type: "integer"
+    description: "Bandwidth utilization alert threshold percentage"
+    required: false
+    default: 80
+  
+  - name: "notification_email"
+    type: "string"
+    description: "Email address for notifications"
+    required: true
+    default: "admin@example.com"
+  
+  - name: "webhook_url"
+    type: "string"
+    description: "Webhook URL for notifications"
+    required: false
+    default: ""
+
+reporting:
+  - name: "Daily Health Report"
+    schedule: "0 8 * * *"
+    format: "pdf"
+    recipients: ["admin@example.com"]
+    content: ["device_status", "performance_metrics", "alerts"]
+  
+  - name: "Weekly Summary"
+    schedule: "0 9 * * 1"
+    format: "html"
+    recipients: ["admin@example.com", "manager@example.com"]
+    content: ["trends", "capacity_planning", "incidents"]

@@ -1,0 +1,25 @@
+# Catalyst Center Templates - Python Dependencies
+
+# Core dependencies
+requests>=2.28.0
+urllib3>=1.26.0
+pyyaml>=6.0
+jinja2>=3.1.0
+
+# Web framework
+Flask>=2.3.0
+gunicorn>=21.2.0
+
+# Cisco specific
+dnacentersdk>=2.4.0
+ciscoconfparse>=1.6.0
+
+# Utilities
+python-dotenv>=0.19.0
+click>=8.0.0
+rich>=12.0.0
+
+# Development dependencies
+pytest>=7.0.0
+black>=22.0.0
+flake8>=4.0.0

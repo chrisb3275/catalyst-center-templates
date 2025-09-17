@@ -47,6 +47,8 @@
                             <i class="fas fa-robot fa-2x text-warning me-3"></i>
                         {% elif category == 'monitoring' %}
                             <i class="fas fa-chart-line fa-2x text-info me-3"></i>
+                        {% elif category == 'community' %}
+                            <i class="fas fa-users fa-2x text-secondary me-3"></i>
                         {% endif %}
                         <div>
                             <h5 class="card-title text-capitalize mb-0">{{ category }}</h5>
@@ -63,6 +65,8 @@
                             Automated workflows and device provisioning templates.
                         {% elif category == 'monitoring' %}
                             Network monitoring, alerting, and health check configurations.
+                        {% elif category == 'community' %}
+                            Shared templates from the broader Cisco community and external sources.
                         {% endif %}
                     </p>
                     
@@ -99,7 +103,7 @@
                         <p class="card-text small text-muted">{{ template.template_description[:100] }}...</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">v{{ template.version }}</small>
-                            <a href="{{ url_for('template_detail', category=category, template_name=template.template_name|lower|replace(' ', '_')) }}" 
+                            <a href="{{ url_for('template_detail', category=category, template_name=template.filename) }}" 
                                class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-external-link-alt me-1"></i>View
                             </a>

@@ -1,0 +1,19 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- AT&T Globe Icon -->
+  <g transform="translate(0, 8)">
+    <!-- Outer ring -->
+    <circle cx="16" cy="12" r="12" fill="none" stroke="#000" stroke-width="1.5"/>
+    <!-- Middle rings -->
+    <circle cx="16" cy="12" r="9" fill="none" stroke="#000" stroke-width="1.2"/>
+    <circle cx="16" cy="12" r="6" fill="none" stroke="#000" stroke-width="1"/>
+    <!-- Inner ring -->
+    <circle cx="16" cy="12" r="3" fill="none" stroke="#000" stroke-width="0.8"/>
+    <!-- Horizontal lines for globe effect -->
+    <line x1="4" y1="12" x2="28" y2="12" stroke="#000" stroke-width="0.8"/>
+    <line x1="6" y1="8" x2="26" y2="8" stroke="#000" stroke-width="0.6"/>
+    <line x1="6" y1="16" x2="26" y2="16" stroke="#000" stroke-width="0.6"/>
+  </g>
+  
+  <!-- AT&T Text -->
+  <text x="40" y="16" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#000">AT&T</text>
+</svg>

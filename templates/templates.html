@@ -129,6 +129,11 @@
                                            class="btn btn-primary btn-sm">
                                             <i class="fas fa-info-circle me-1"></i>Details
                                         </a>
+                                        <button class="btn btn-outline-warning btn-sm" 
+                                                onclick="showMoveTemplateModal('{{ category }}', '{{ template.filename }}')"
+                                                title="Move to Different Category">
+                                            <i class="fas fa-arrows-alt me-1"></i>Move
+                                        </button>
                                     </div>
                                     <div>
                                         <a href="{{ url_for('download_template', category=category, template_name=template.filename) }}" 
@@ -317,5 +322,107 @@ function downloadSelected() {
         button.disabled = false;
     });
 }
+
+// Move Template Functions
+function showMoveTemplateModal(category, templateName) {
+    // Set template info
+    document.getElementById('moveTemplateName').value = templateName;
+    document.getElementById('moveCurrentCategory').value = category;
+    
+    // Clear previous options
+    const select = document.getElementById('moveTargetCategory');
+    select.innerHTML = '<option value="">Select destination category...</option>';
+    
+    // Load available categories
+    fetch(`/api/templates/${category}/${templateName}/move`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.available_categories) {
+                Object.entries(data.available_categories).forEach(([key, categoryInfo]) => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = categoryInfo.display_name || key.charAt(0).toUpperCase() + key.slice(1);
+                    select.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading categories:', error);
+            showAlert('Failed to load available categories', 'danger');
+        });
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('moveTemplateModal'));
+    modal.show();
+}
+
+// Handle move confirmation
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmMoveBtn = document.getElementById('confirmMoveBtn');
+    if (confirmMoveBtn) {
+        confirmMoveBtn.addEventListener('click', function() {
+            const templateName = document.getElementById('moveTemplateName').value;
+            const fromCategory = document.getElementById('moveCurrentCategory').value;
+            const toCategory = document.getElementById('moveTargetCategory').value;
+            
+            if (!toCategory) {
+                showAlert('Please select a destination category', 'warning');
+                return;
+            }
+            
+            if (fromCategory === toCategory) {
+                showAlert('Source and destination categories are the same', 'warning');
+                return;
+            }
+            
+            // Confirm move
+            if (!confirm(`Are you sure you want to move "${templateName}" from "${fromCategory}" to "${toCategory}"?`)) {
+                return;
+            }
+            
+            // Disable button and show loading
+            const originalText = confirmMoveBtn.innerHTML;
+            confirmMoveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Moving...';
+            confirmMoveBtn.disabled = true;
+            
+            // Make API call
+            fetch('/api/templates/move', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    template_name: templateName,
+                    from_category: fromCategory,
+                    to_category: toCategory
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('moveTemplateModal'));
+                    modal.hide();
+                    // Reload page to show updated template locations
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert(data.error, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error moving template:', error);
+                showAlert('Failed to move template', 'danger');
+            })
+            .finally(() => {
+                // Restore button
+                confirmMoveBtn.innerHTML = originalText;
+                confirmMoveBtn.disabled = false;
+            });
+        });
+    }
+});
 </script>
 {% endblock %}

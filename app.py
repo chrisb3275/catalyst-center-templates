@@ -660,6 +660,90 @@ def delete_category(category_name):
         logger.error(f"Error deleting category {category_name}: {e}")
         return jsonify({'error': 'Failed to delete category'}), 500
 
+@app.route('/api/templates/move', methods=['POST'])
+def move_template():
+    """Move a template from one category to another."""
+    data = request.get_json()
+    template_name = data.get('template_name')
+    from_category = data.get('from_category')
+    to_category = data.get('to_category')
+    
+    if not all([template_name, from_category, to_category]):
+        return jsonify({'error': 'Missing required parameters'}), 400
+    
+    if from_category == to_category:
+        return jsonify({'error': 'Source and destination categories are the same'}), 400
+    
+    # Validate categories exist
+    if from_category not in TEMPLATE_DIRS:
+        return jsonify({'error': f'Source category "{from_category}" does not exist'}), 404
+    
+    if to_category not in TEMPLATE_DIRS:
+        return jsonify({'error': f'Destination category "{to_category}" does not exist'}), 404
+    
+    try:
+        from_path = Path(TEMPLATE_DIRS[from_category]) / template_name
+        to_path = Path(TEMPLATE_DIRS[to_category]) / template_name
+        
+        # Check if source file exists
+        if not from_path.exists():
+            return jsonify({'error': f'Template "{template_name}" not found in "{from_category}"'}), 404
+        
+        # Check if destination file already exists
+        if to_path.exists():
+            return jsonify({'error': f'Template "{template_name}" already exists in "{to_category}"'}), 409
+        
+        # Create destination directory if it doesn't exist
+        to_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Move the file
+        from_path.rename(to_path)
+        
+        logger.info(f"Moved template '{template_name}' from '{from_category}' to '{to_category}'")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Template "{template_name}" moved from "{from_category}" to "{to_category}" successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error moving template {template_name}: {e}")
+        return jsonify({'error': 'Failed to move template'}), 500
+
+@app.route('/api/templates/<category>/<template_name>/move', methods=['GET'])
+def get_move_template_form(category, template_name):
+    """Get the move template form data."""
+    try:
+        # Get all available categories
+        all_categories = {}
+        custom_categories = load_custom_categories()
+        
+        # Add built-in categories
+        built_in_categories = {
+            'network': {'display_name': 'Network', 'icon': 'fas fa-network-wired', 'color': 'primary'},
+            'security': {'display_name': 'Security', 'icon': 'fas fa-shield-alt', 'color': 'success'},
+            'automation': {'display_name': 'Automation', 'icon': 'fas fa-robot', 'color': 'warning'},
+            'monitoring': {'display_name': 'Monitoring', 'icon': 'fas fa-chart-line', 'color': 'info'},
+            'community': {'display_name': 'Community', 'icon': 'fas fa-users', 'color': 'secondary'}
+        }
+        
+        all_categories.update(built_in_categories)
+        all_categories.update(custom_categories)
+        
+        # Remove current category from options
+        if category in all_categories:
+            del all_categories[category]
+        
+        return jsonify({
+            'template_name': template_name,
+            'current_category': category,
+            'available_categories': all_categories
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting move form data: {e}")
+        return jsonify({'error': 'Failed to load move form data'}), 500
+
 @app.route('/test-logos')
 def test_logos():
     """Test endpoint to check if logos are accessible."""

@@ -157,7 +157,7 @@ def templates_category(category):
     templates = get_templates_by_category(category)
     return render_template('templates.html', category=category, templates=templates)
 
-@app.route('/template/<category>/<template_name>')
+@app.route('/template/<category>/<path:template_name>')
 def template_detail(category, template_name):
     """Show detailed view of a specific template."""
     # Try YAML first, then JSON
@@ -180,6 +180,7 @@ def template_detail(category, template_name):
     template['file_path'] = str(template_path)
     template['category'] = category
     template['file_type'] = template_path.suffix[1:]  # Remove the dot
+    template['filename'] = template_name  # Ensure filename is set
     
     return render_template('template_detail.html', template=template)
 
@@ -229,24 +230,65 @@ def api_templates_category(category):
     templates = get_templates_by_category(category)
     return jsonify(templates)
 
-@app.route('/download/<category>/<template_name>')
+@app.route('/download/<category>/<path:template_name>')
 def download_template(category, template_name):
     """Download a template file."""
-    # Try YAML first, then JSON
-    yaml_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.yaml"
-    json_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.json"
-    
-    template_path = None
-    if yaml_path.exists():
-        template_path = yaml_path
-    elif json_path.exists():
-        template_path = json_path
-    
-    if not template_path:
-        return "Template not found", 404
-    
-    return send_file(template_path, as_attachment=True, 
-                    download_name=f"{template_name}{template_path.suffix}")
+    try:
+        if category not in TEMPLATE_DIRS:
+            return jsonify({'error': 'Category not found'}), 404
+        
+        # Try YAML first, then JSON
+        yaml_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.yaml"
+        json_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.json"
+        
+        template_path = None
+        if yaml_path.exists():
+            template_path = yaml_path
+        elif json_path.exists():
+            template_path = json_path
+        
+        if not template_path:
+            return jsonify({'error': 'Template file not found'}), 404
+        
+        return send_file(template_path, as_attachment=True, 
+                        download_name=f"{template_name}{template_path.suffix}")
+    except Exception as e:
+        logger.error(f"Error downloading template {template_name}: {e}")
+        return jsonify({'error': 'Download failed'}), 500
+
+@app.route('/preview/<category>/<path:template_name>')
+def preview_template(category, template_name):
+    """Preview a template file content."""
+    try:
+        if category not in TEMPLATE_DIRS:
+            return jsonify({'error': 'Category not found'}), 404
+        
+        # Try YAML first, then JSON
+        yaml_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.yaml"
+        json_path = Path(TEMPLATE_DIRS[category]) / f"{template_name}.json"
+        
+        template_path = None
+        if yaml_path.exists():
+            template_path = yaml_path
+        elif json_path.exists():
+            template_path = json_path
+        
+        if not template_path:
+            return jsonify({'error': 'Template file not found'}), 404
+        
+        # Read file content
+        with open(template_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        return jsonify({
+            'success': True,
+            'content': content,
+            'filename': template_path.name,
+            'file_type': template_path.suffix[1:]
+        })
+    except Exception as e:
+        logger.error(f"Error previewing template {template_name}: {e}")
+        return jsonify({'error': 'Preview failed'}), 500
 
 @app.route('/search')
 def search_templates():

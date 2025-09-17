@@ -46,6 +46,29 @@ An internal web application for the Cisco Automation-X Catalyst Center - AT&T te
 
 Your app will be live at `https://your-app-name.onrender.com`
 
+## 🛠️ Development Workflow
+
+For detailed information about the complete development workflow, including Docker, Git, and Render integration, see:
+
+- **[DEVELOPMENT_WORKFLOW.md](DEVELOPMENT_WORKFLOW.md)** - Complete development to deployment guide
+- **[README-Docker.md](README-Docker.md)** - Docker setup and usage
+- **[DEPLOY_TO_RENDER.md](DEPLOY_TO_RENDER.md)** - Render deployment guide
+
+### Quick Development Commands
+```bash
+# Start local development
+docker-compose up -d --build
+
+# Test changes
+curl http://localhost:8080
+
+# Commit and deploy
+git add .
+git commit -m "Your changes"
+git push origin main
+# Render automatically deploys!
+```
+
 ## 📁 Project Structure
 
 ```

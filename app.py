@@ -43,15 +43,29 @@ def load_json_template(template_path):
     try:
         with open(template_path, 'r') as file:
             data = json.load(file)
+            
+            # Handle both single objects and arrays
+            if isinstance(data, list):
+                # If it's an array, take the first template
+                if data:
+                    template_data = data[0]
+                else:
+                    return None
+            else:
+                template_data = data
+            
             # Convert JSON to a standard template format
             return {
-                'name': data.get('name', Path(template_path).stem),
-                'description': data.get('description', 'Community template'),
-                'configuration': data.get('configuration', []),
-                'parameters': data.get('parameters', {}),
-                'tags': data.get('tags', ['community']),
-                'author': data.get('author', 'Community'),
-                'version': data.get('version', '1.0')
+                'template_name': template_data.get('name', Path(template_path).stem),
+                'template_description': template_data.get('description', 'Community template'),
+                'configuration': template_data.get('templateContent', '').split('\n') if template_data.get('templateContent') else [],
+                'parameters': template_data.get('templateParams', []),
+                'tags': template_data.get('tags', ['community']),
+                'author': template_data.get('author', 'Community'),
+                'version': template_data.get('version', '1.0'),
+                'device_types': template_data.get('deviceTypes', []),
+                'software_type': template_data.get('softwareType', ''),
+                'software_variant': template_data.get('softwareVariant', '')
             }
     except Exception as e:
         logger.error(f"Error loading JSON template {template_path}: {e}")

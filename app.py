@@ -25,7 +25,8 @@ TEMPLATE_DIRS = {
     'network': 'templates/network',
     'security': 'templates/security',
     'automation': 'templates/automation',
-    'monitoring': 'templates/monitoring'
+    'monitoring': 'templates/monitoring',
+    'community': 'templates/community'
 }
 
 def load_template(template_path):

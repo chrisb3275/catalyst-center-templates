@@ -1,6 +1,6 @@
-# Catalyst Center Templates
+# Automation-X AT&T CONNEXUS
 
-An internal web application for Cisco Engineering teams to view, manage, and download Catalyst Center templates. This tool provides a centralized repository for sharing and accessing network configuration templates across your engineering organization.
+An internal web application for the Cisco Automation-X AT&T CONNEXUS team to document, manage, and test Catalyst Center templates. This tool provides a centralized repository for tracking template initiatives, testing customer templates internally, and building/deploying templates for the AT&T CONNEXUS project.
 
 ## 🌐 Live Demo
 
@@ -74,13 +74,15 @@ catalyst-center-templates/
 
 ## 🎯 Features
 
-### Internal Team Management
-- **Template Repository** - Centralized storage for all team templates
+### AT&T CONNEXUS Project Management
+- **Template Documentation** - Document and track template initiatives
+- **Customer Template Testing** - Test and validate customer templates internally
+- **Template Development** - Build, deploy, and test templates for CONNEXUS
 - **Category Organization** - Network, Security, Automation, Monitoring, Community
 - **Template Browser** - Easy search and discovery of existing templates
 - **Parameter Management** - Interactive forms for template customization
 - **Download Center** - One-click download of template files
-- **Team Collaboration** - Share templates across engineering teams
+- **Team Collaboration** - Share templates across the Automation-X team
 - **Version Control** - Track template versions and changes
 
 ### Template Categories

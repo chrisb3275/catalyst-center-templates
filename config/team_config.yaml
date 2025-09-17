@@ -1,9 +1,10 @@
-# Cisco Engineering Team Configuration
+# Automation-X AT&T CONNEXUS Team Configuration
 team:
-  name: "Cisco Engineering Team"
-  department: "Network Engineering"
+  name: "Automation-X AT&T CONNEXUS Team"
+  department: "Customer Success Engineering"
+  project: "AT&T CONNEXUS"
   contact: "chrisb3@cisco.com"
-  purpose: "Internal template repository for Catalyst Center automation"
+  purpose: "Template management platform for AT&T CONNEXUS project - document initiatives, test customer templates, and build/deploy templates"
 
 deployment:
   environment: "internal"

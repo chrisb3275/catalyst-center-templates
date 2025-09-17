@@ -57,7 +57,11 @@ def load_json_template(template_path):
                 return None
             
             # Handle different JSON structures
-            if isinstance(data, list):
+            if isinstance(data, str):
+                # If it's a string, skip this file as it's not a valid template
+                logger.warning(f"Skipping JSON file with string content: {template_path}")
+                return None
+            elif isinstance(data, list):
                 if data:
                     # Check if it's a project with templates array
                     if 'templates' in data[0]:

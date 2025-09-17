@@ -343,12 +343,29 @@ def search_templates():
     for template in all_templates:
         # Text search
         if query:
+            # Extract device type names from dictionaries
+            device_type_names = []
+            for device_type in template.get('device_types', []):
+                if isinstance(device_type, dict):
+                    device_type_names.append(device_type.get('productFamily', ''))
+                    device_type_names.append(device_type.get('productSeries', ''))
+                else:
+                    device_type_names.append(str(device_type))
+            
+            # Extract tag names from dictionaries or strings
+            tag_names = []
+            for tag in template.get('tags', []):
+                if isinstance(tag, dict):
+                    tag_names.append(tag.get('name', str(tag)))
+                else:
+                    tag_names.append(str(tag))
+            
             searchable_text = ' '.join([
                 template.get('template_name', ''),
                 template.get('template_description', ''),
-                ' '.join(template.get('tags', [])),
+                ' '.join(tag_names),
                 template.get('author', ''),
-                ' '.join(template.get('device_types', []))
+                ' '.join(device_type_names)
             ]).lower()
             
             if query not in searchable_text:

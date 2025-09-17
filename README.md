@@ -1,6 +1,6 @@
 # Catalyst Center Templates
 
-A comprehensive collection of templates and automation scripts for Cisco Catalyst Center (DNA Center) with a modern web interface.
+An internal web application for Cisco Engineering teams to view, manage, and download Catalyst Center templates. This tool provides a centralized repository for sharing and accessing network configuration templates across your engineering organization.
 
 ## 🌐 Live Demo
 
@@ -74,13 +74,14 @@ catalyst-center-templates/
 
 ## 🎯 Features
 
-### Web Interface
-- **Modern UI** with Bootstrap 5 and responsive design
-- **Template Browser** organized by categories
-- **Interactive Template Renderer** with parameter forms
-- **API Endpoints** for programmatic access
-- **Download Functionality** for template files
-- **Health Monitoring** with status endpoints
+### Internal Team Management
+- **Template Repository** - Centralized storage for all team templates
+- **Category Organization** - Network, Security, Automation, Monitoring, Community
+- **Template Browser** - Easy search and discovery of existing templates
+- **Parameter Management** - Interactive forms for template customization
+- **Download Center** - One-click download of template files
+- **Team Collaboration** - Share templates across engineering teams
+- **Version Control** - Track template versions and changes
 
 ### Template Categories
 - **Network Templates**: Switch, router, and access point configurations

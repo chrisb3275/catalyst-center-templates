@@ -1,0 +1,60 @@
+# Cisco Engineering Team Configuration
+team:
+  name: "Cisco Engineering Team"
+  department: "Network Engineering"
+  contact: "chrisb3@cisco.com"
+  purpose: "Internal template repository for Catalyst Center automation"
+
+deployment:
+  environment: "internal"
+  access_level: "team_members"
+  authentication: "cisco_ldap"
+  
+templates:
+  categories:
+    - name: "Network"
+      description: "Core network configuration templates"
+      icon: "fas fa-network-wired"
+      color: "primary"
+    
+    - name: "Security"
+      description: "Security policies and access control"
+      icon: "fas fa-shield-alt"
+      color: "success"
+    
+    - name: "Automation"
+      description: "Workflow and device automation"
+      icon: "fas fa-robot"
+      color: "warning"
+    
+    - name: "Monitoring"
+      description: "Network monitoring and alerting"
+      icon: "fas fa-chart-line"
+      color: "info"
+    
+    - name: "Community"
+      description: "Shared templates from the community"
+      icon: "fas fa-users"
+      color: "secondary"
+
+features:
+  template_management: true
+  parameter_rendering: true
+  download_functionality: true
+  api_access: true
+  version_control: true
+  team_collaboration: true
+  search_functionality: true
+  categorization: true
+
+api:
+  base_url: "/api"
+  rate_limiting: true
+  authentication_required: false
+  cors_enabled: true
+
+branding:
+  company: "Cisco"
+  logo: "/static/images/cisco-logo.png"
+  theme_color: "#1ba1e2"
+  footer_text: "Cisco Engineering Team - Internal Use Only"

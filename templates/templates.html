@@ -117,21 +117,26 @@
                         </div>
                         {% endif %}
                         
-                        <!-- Actions -->
-                        <div class="d-flex justify-content-between align-items-center mt-auto">
-                            <div>
-                                <a href="{{ url_for('template_detail', category=category, template_name=template.filename) }}" 
-                                   class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
-                            </div>
-                            <div>
-                                <a href="{{ url_for('download_template', category=category, template_name=template.filename) }}" 
-                                   class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-download me-1"></i>Download
-                                </a>
-                            </div>
-                        </div>
+                                <!-- Actions -->
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-info btn-sm" 
+                                                onclick="previewTemplate('{{ category }}', '{{ template.filename }}')"
+                                                title="Quick Preview">
+                                            <i class="fas fa-eye me-1"></i>Preview
+                                        </button>
+                                        <a href="{{ url_for('template_detail', category=category, template_name=template.filename) }}" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-info-circle me-1"></i>Details
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <a href="{{ url_for('download_template', category=category, template_name=template.filename) }}" 
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-download me-1"></i>Download
+                                        </a>
+                                    </div>
+                                </div>
                     </div>
                 </div>
             </div>

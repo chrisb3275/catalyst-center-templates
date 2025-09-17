@@ -1,6 +1,9 @@
 // Catalyst Center Templates - JavaScript Application
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dark mode
+    initializeDarkMode();
+    
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -245,6 +248,65 @@ document.addEventListener('DOMContentLoaded', function() {
 
     images.forEach(img => imageObserver.observe(img));
 
+    // Template preview functionality
+    window.previewTemplate = function(category, templateName) {
+        const modal = new bootstrap.Modal(document.getElementById('templatePreviewModal'));
+        const previewInfo = document.getElementById('previewInfo');
+        const previewContent = document.getElementById('previewContent');
+        const previewDownloadBtn = document.getElementById('previewDownloadBtn');
+        const previewViewBtn = document.getElementById('previewViewBtn');
+        
+        // Show loading state
+        previewInfo.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        previewContent.textContent = 'Loading template content...';
+        
+        // Fetch template preview
+        fetch(`/preview/${category}/${templateName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update template info
+                    previewInfo.innerHTML = `
+                        <div class="mb-2">
+                            <strong>Name:</strong> ${data.template_name || templateName}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Category:</strong> ${category}
+                        </div>
+                        <div class="mb-2">
+                            <strong>File Type:</strong> ${data.file_type || 'Unknown'}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Size:</strong> ${data.content ? data.content.length : 0} characters
+                        </div>
+                    `;
+                    
+                    // Update template content
+                    previewContent.textContent = data.content || 'No content available';
+                    
+                    // Update button actions
+                    previewDownloadBtn.onclick = () => {
+                        window.location.href = `/download/${category}/${templateName}`;
+                    };
+                    
+                    previewViewBtn.onclick = () => {
+                        modal.hide();
+                        window.location.href = `/template/${category}/${templateName}`;
+                    };
+                } else {
+                    previewInfo.innerHTML = '<div class="alert alert-danger">Error loading template preview</div>';
+                    previewContent.textContent = 'Error: ' + (data.error || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                previewInfo.innerHTML = '<div class="alert alert-danger">Error loading template preview</div>';
+                previewContent.textContent = 'Error: ' + error.message;
+            });
+        
+        modal.show();
+    };
+
     // Keyboard shortcuts
     document.addEventListener('keydown', function(e) {
         // Ctrl/Cmd + K for search
@@ -344,3 +406,36 @@ window.utils = {
         };
     }
 };
+
+// Dark Mode Functions
+function initializeDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    
+    if (!darkModeToggle || !darkModeIcon) return;
+    
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    
+    // Add click event listener
+    darkModeToggle.addEventListener('click', function() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    });
+}
+
+function setTheme(theme) {
+    const darkModeIcon = document.getElementById('darkModeIcon');
+    
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        darkModeIcon.className = 'fas fa-sun';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        darkModeIcon.className = 'fas fa-moon';
+        localStorage.setItem('theme', 'light');
+    }
+}

@@ -522,3 +522,80 @@ function loadDynamicNavigation() {
             });
         });
 }
+
+
+// Keyboard Shortcuts Help
+function showKeyboardShortcuts() {
+    const shortcutsModal = document.createElement("div");
+    shortcutsModal.className = "modal fade";
+    shortcutsModal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-keyboard me-2"></i>Keyboard Shortcuts
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Navigation</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>Ctrl</kbd> + <kbd>H</kbd></span>
+                                    <span>Go to Home</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>Ctrl</kbd> + <kbd>K</kbd></span>
+                                    <span>Focus Search</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>Ctrl</kbd> + <kbd>U</kbd></span>
+                                    <span>Upload Template</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>Ctrl</kbd> + <kbd>N</kbd></span>
+                                    <span>New Category</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>Ctrl</kbd> + <kbd>M</kbd></span>
+                                    <span>Manage Categories</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>General</h6>
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>Esc</kbd></span>
+                                    <span>Close Modal</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>F1</kbd></span>
+                                    <span>Show Help</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><kbd>Ctrl</kbd> + <kbd>/</kbd></span>
+                                    <span>Toggle Dark Mode</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(shortcutsModal);
+    const modal = new bootstrap.Modal(shortcutsModal);
+    modal.show();
+    
+    // Clean up when modal is hidden
+    shortcutsModal.addEventListener("hidden.bs.modal", function() {
+        document.body.removeChild(shortcutsModal);
+    });
+}

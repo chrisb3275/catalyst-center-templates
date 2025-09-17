@@ -44,11 +44,19 @@ def load_json_template(template_path):
         with open(template_path, 'r') as file:
             data = json.load(file)
             
-            # Handle both single objects and arrays
+            # Handle different JSON structures
             if isinstance(data, list):
-                # If it's an array, take the first template
                 if data:
-                    template_data = data[0]
+                    # Check if it's a project with templates array
+                    if 'templates' in data[0]:
+                        # It's a project file, take the first template from templates array
+                        if data[0]['templates']:
+                            template_data = data[0]['templates'][0]
+                        else:
+                            return None
+                    else:
+                        # It's a direct template array
+                        template_data = data[0]
                 else:
                     return None
             else:

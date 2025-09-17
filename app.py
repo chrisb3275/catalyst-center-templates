@@ -92,6 +92,7 @@ def get_templates_by_category(category):
                 template['file_path'] = str(file_path)
                 template['category'] = category
                 template['file_type'] = 'yaml'
+                template['filename'] = file_path.stem  # Store the actual filename without extension
                 templates.append(template)
         
         for file_path in template_dir.glob('*.json'):
@@ -100,6 +101,7 @@ def get_templates_by_category(category):
                 template['file_path'] = str(file_path)
                 template['category'] = category
                 template['file_type'] = 'json'
+                template['filename'] = file_path.stem  # Store the actual filename without extension
                 templates.append(template)
     
     return templates

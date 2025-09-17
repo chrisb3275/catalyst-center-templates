@@ -18,9 +18,14 @@
                 </p>
                 <hr class="my-4">
                 <p>Get started by exploring our template categories or use our API for programmatic access.</p>
-                <a class="btn btn-light btn-lg" href="#templates" role="button">
-                    <i class="fas fa-rocket me-2"></i>Explore Templates
-                </a>
+                <div class="btn-group" role="group">
+                    <a class="btn btn-light btn-lg" href="#templates" role="button">
+                        <i class="fas fa-rocket me-2"></i>Explore Templates
+                    </a>
+                    <a class="btn btn-outline-light btn-lg" href="{{ url_for('create_category') }}" role="button">
+                        <i class="fas fa-plus-circle me-2"></i>Create Category
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -34,52 +39,62 @@
             </h2>
         </div>
         
-        {% for category, info in categories.items() %}
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        {% if category == 'network' %}
-                            <i class="fas fa-network-wired fa-2x text-primary me-3"></i>
-                        {% elif category == 'security' %}
-                            <i class="fas fa-shield-alt fa-2x text-success me-3"></i>
-                        {% elif category == 'automation' %}
-                            <i class="fas fa-robot fa-2x text-warning me-3"></i>
-                        {% elif category == 'monitoring' %}
-                            <i class="fas fa-chart-line fa-2x text-info me-3"></i>
-                        {% elif category == 'community' %}
-                            <i class="fas fa-users fa-2x text-secondary me-3"></i>
-                        {% endif %}
-                        <div>
-                            <h5 class="card-title text-capitalize mb-0">{{ category }}</h5>
-                            <small class="text-muted">{{ info.count }} templates</small>
+                {% for category, info in categories.items() %}
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if info.icon and info.color %}
+                                    <i class="{{ info.icon }} fa-2x text-{{ info.color }} me-3"></i>
+                                {% elif category == 'network' %}
+                                    <i class="fas fa-network-wired fa-2x text-primary me-3"></i>
+                                {% elif category == 'security' %}
+                                    <i class="fas fa-shield-alt fa-2x text-success me-3"></i>
+                                {% elif category == 'automation' %}
+                                    <i class="fas fa-robot fa-2x text-warning me-3"></i>
+                                {% elif category == 'monitoring' %}
+                                    <i class="fas fa-chart-line fa-2x text-info me-3"></i>
+                                {% elif category == 'community' %}
+                                    <i class="fas fa-users fa-2x text-secondary me-3"></i>
+                                {% else %}
+                                    <i class="fas fa-folder fa-2x text-secondary me-3"></i>
+                                {% endif %}
+                                <div>
+                                    <h5 class="card-title mb-0">
+                                        {{ info.display_name if info.display_name else category|title }}
+                                    </h5>
+                                    <small class="text-muted">{{ info.count }} templates</small>
+                                </div>
+                            </div>
+                            
+                            <p class="card-text">
+                                {% if info.description %}
+                                    {{ info.description }}
+                                {% elif category == 'network' %}
+                                    Network configuration templates for switches, routers, and access points.
+                                {% elif category == 'security' %}
+                                    Security policies, ACLs, and access control configurations.
+                                {% elif category == 'automation' %}
+                                    Automated workflows and device provisioning templates.
+                                {% elif category == 'monitoring' %}
+                                    Network monitoring, alerting, and health check configurations.
+                                {% elif category == 'community' %}
+                                    Shared templates from the broader Cisco community and external sources.
+                                {% else %}
+                                    Custom template category for specialized configurations.
+                                {% endif %}
+                            </p>
+                            
+                            <div class="mt-auto">
+                                <a href="{{ url_for('templates_category', category=category) }}" 
+                                   class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye me-1"></i>View All
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    
-                    <p class="card-text">
-                        {% if category == 'network' %}
-                            Network configuration templates for switches, routers, and access points.
-                        {% elif category == 'security' %}
-                            Security policies, ACLs, and access control configurations.
-                        {% elif category == 'automation' %}
-                            Automated workflows and device provisioning templates.
-                        {% elif category == 'monitoring' %}
-                            Network monitoring, alerting, and health check configurations.
-                        {% elif category == 'community' %}
-                            Shared templates from the broader Cisco community and external sources.
-                        {% endif %}
-                    </p>
-                    
-                    <div class="mt-auto">
-                        <a href="{{ url_for('templates_category', category=category) }}" 
-                           class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-eye me-1"></i>View All
-                        </a>
-                    </div>
                 </div>
-            </div>
-        </div>
-        {% endfor %}
+                {% endfor %}
     </div>
 
     <!-- Recent Templates -->

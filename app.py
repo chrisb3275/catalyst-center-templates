@@ -38,6 +38,17 @@ def load_template(template_path):
         logger.error(f"Error loading template {template_path}: {e}")
         return None
 
+def load_custom_categories():
+    """Load custom categories from categories.json."""
+    categories_file = Path('data/categories.json')
+    if categories_file.exists():
+        try:
+            with open(categories_file, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading custom categories: {e}")
+    return {}
+
 def load_json_template(template_path):
     """Load a JSON template file."""
     try:
@@ -139,12 +150,28 @@ def render_template_with_params(template, parameters):
 def index():
     """Home page showing all template categories."""
     categories = {}
-    for category in TEMPLATE_DIRS.keys():
+    custom_categories = load_custom_categories()
+    
+    # Load all categories (built-in + custom)
+    all_categories = set(TEMPLATE_DIRS.keys())
+    for cat_name in custom_categories.keys():
+        if cat_name not in TEMPLATE_DIRS:
+            # Add custom category to TEMPLATE_DIRS if not already there
+            TEMPLATE_DIRS[cat_name] = str(Path('templates') / cat_name)
+        all_categories.add(cat_name)
+    
+    for category in all_categories:
         templates = get_templates_by_category(category)
-        categories[category] = {
+        category_info = {
             'count': len(templates),
             'templates': templates[:3]  # Show first 3 templates
         }
+        
+        # Add custom category metadata if available
+        if category in custom_categories:
+            category_info.update(custom_categories[category])
+        
+        categories[category] = category_info
     
     return render_template('index.html', categories=categories)
 
@@ -418,6 +445,67 @@ def bulk_download():
     except Exception as e:
         logger.error(f"Error in bulk download: {e}")
         return jsonify({'error': 'Bulk download failed'}), 500
+
+@app.route('/create-category', methods=['GET', 'POST'])
+def create_category():
+    """Create a new template category."""
+    if request.method == 'GET':
+        return render_template('create_category.html')
+    
+    data = request.get_json()
+    category_name = data.get('name', '').strip().lower()
+    description = data.get('description', '').strip()
+    icon = data.get('icon', 'fas fa-folder')
+    color = data.get('color', 'secondary')
+    
+    if not category_name:
+        return jsonify({'error': 'Category name is required'}), 400
+    
+    # Validate category name (alphanumeric and hyphens only)
+    import re
+    if not re.match(r'^[a-z0-9-]+$', category_name):
+        return jsonify({'error': 'Category name can only contain lowercase letters, numbers, and hyphens'}), 400
+    
+    if category_name in TEMPLATE_DIRS:
+        return jsonify({'error': 'Category already exists'}), 400
+    
+    # Create category directory
+    category_dir = Path('templates') / category_name
+    category_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Update TEMPLATE_DIRS
+    TEMPLATE_DIRS[category_name] = str(category_dir)
+    
+    # Save category metadata
+    category_metadata = {
+        'name': category_name,
+        'display_name': data.get('display_name', category_name.title()),
+        'description': description,
+        'icon': icon,
+        'color': color,
+        'created_at': datetime.now().isoformat()
+    }
+    
+    # Save to categories.json
+    categories_file = Path('data/categories.json')
+    categories_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    if categories_file.exists():
+        with open(categories_file, 'r') as f:
+            categories_data = json.load(f)
+    else:
+        categories_data = {}
+    
+    categories_data[category_name] = category_metadata
+    
+    with open(categories_file, 'w') as f:
+        json.dump(categories_data, f, indent=2)
+    
+    return jsonify({
+        'success': True,
+        'message': f'Category "{category_name}" created successfully',
+        'category': category_metadata
+    })
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_template():

@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Category - Automation-X Catalyst Center - AT&T{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create Category</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-plus-circle me-2 text-primary"></i>Create New Category</h1>
+                    <p class="text-muted">Add a new template category to organize your templates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Category Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form id="createCategoryForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="categoryName" class="form-label">
+                                        <i class="fas fa-tag me-1"></i>Category Name *
+                                    </label>
+                                    <input type="text" class="form-control" id="categoryName" name="name" 
+                                           placeholder="e.g., wireless, voice, data-center" required>
+                                    <div class="form-text">Use lowercase letters, numbers, and hyphens only</div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="displayName" class="form-label">
+                                        <i class="fas fa-eye me-1"></i>Display Name
+                                    </label>
+                                    <input type="text" class="form-control" id="displayName" name="display_name" 
+                                           placeholder="e.g., Wireless, Voice, Data Center">
+                                    <div class="form-text">Leave empty to auto-generate from category name</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>Description
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="3" 
+                                      placeholder="Describe what types of templates belong in this category..."></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="icon" class="form-label">
+                                        <i class="fas fa-icons me-1"></i>Icon
+                                    </label>
+                                    <select class="form-select" id="icon" name="icon">
+                                        <option value="fas fa-folder">📁 Folder</option>
+                                        <option value="fas fa-wifi">📶 WiFi</option>
+                                        <option value="fas fa-phone">📞 Phone</option>
+                                        <option value="fas fa-server">🖥️ Server</option>
+                                        <option value="fas fa-database">🗄️ Database</option>
+                                        <option value="fas fa-cloud">☁️ Cloud</option>
+                                        <option value="fas fa-lock">🔒 Security</option>
+                                        <option value="fas fa-cog">⚙️ Settings</option>
+                                        <option value="fas fa-chart-bar">📊 Analytics</option>
+                                        <option value="fas fa-tools">🔧 Tools</option>
+                                        <option value="fas fa-mobile-alt">📱 Mobile</option>
+                                        <option value="fas fa-desktop">🖥️ Desktop</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="color" class="form-label">
+                                        <i class="fas fa-palette me-1"></i>Color Theme
+                                    </label>
+                                    <select class="form-select" id="color" name="color">
+                                        <option value="primary">🔵 Primary (Blue)</option>
+                                        <option value="success">🟢 Success (Green)</option>
+                                        <option value="warning">🟡 Warning (Yellow)</option>
+                                        <option value="danger">🔴 Danger (Red)</option>
+                                        <option value="info">🔵 Info (Cyan)</option>
+                                        <option value="secondary">⚫ Secondary (Gray)</option>
+                                        <option value="dark">⚫ Dark (Black)</option>
+                                        <option value="light">⚪ Light (White)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview Section -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-eye me-1"></i>Preview
+                            </label>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <i id="previewIcon" class="fas fa-folder fa-2x text-primary me-3"></i>
+                                        <div>
+                                            <h5 id="previewName" class="card-title mb-0">Category Name</h5>
+                                            <p id="previewDescription" class="card-text text-muted mb-0">Category description will appear here</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Create Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle me-2"></i>Category Guidelines
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Naming Convention:</h6>
+                            <ul class="list-unstyled">
+                                <li>• Use lowercase letters only</li>
+                                <li>• Use hyphens instead of spaces</li>
+                                <li>• Be descriptive but concise</li>
+                                <li>• Examples: wireless, voice-gateway, data-center</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Best Practices:</h6>
+                            <ul class="list-unstyled">
+                                <li>• Choose icons that represent the category</li>
+                                <li>• Use colors that match your organization's theme</li>
+                                <li>• Write clear descriptions for team members</li>
+                                <li>• Consider existing categories before creating new ones</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('createCategoryForm');
+    const categoryName = document.getElementById('categoryName');
+    const displayName = document.getElementById('displayName');
+    const description = document.getElementById('description');
+    const icon = document.getElementById('icon');
+    const color = document.getElementById('color');
+    
+    // Preview elements
+    const previewIcon = document.getElementById('previewIcon');
+    const previewName = document.getElementById('previewName');
+    const previewDescription = document.getElementById('previewDescription');
+    
+    // Auto-generate display name from category name
+    categoryName.addEventListener('input', function() {
+        if (!displayName.value) {
+            displayName.value = this.value.split('-').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+        updatePreview();
+    });
+    
+    // Update preview on input change
+    [displayName, description, icon, color].forEach(element => {
+        element.addEventListener('input', updatePreview);
+    });
+    
+    function updatePreview() {
+        const name = displayName.value || categoryName.value.split('-').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+        const desc = description.value || 'Category description will appear here';
+        const iconClass = icon.value;
+        const colorClass = color.value;
+        
+        previewName.textContent = name;
+        previewDescription.textContent = desc;
+        previewIcon.className = `${iconClass} fa-2x text-${colorClass} me-3`;
+    }
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Validate category name
+        if (!/^[a-z0-9-]+$/.test(data.name)) {
+            alert('Category name can only contain lowercase letters, numbers, and hyphens');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+        submitBtn.disabled = true;
+        
+        fetch('/create-category', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Category created successfully!');
+                window.location.href = '/';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while creating the category');
+        })
+        .finally(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+    
+    // Initialize preview
+    updatePreview();
+});
+</script>
+{% endblock %}

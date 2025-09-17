@@ -446,6 +446,11 @@ def bulk_download():
         logger.error(f"Error in bulk download: {e}")
         return jsonify({'error': 'Bulk download failed'}), 500
 
+@app.route('/manage-categories')
+def manage_categories():
+    """Manage template categories page."""
+    return render_template('manage_categories.html')
+
 @app.route('/create-category', methods=['GET', 'POST'])
 def create_category():
     """Create a new template category."""
@@ -546,6 +551,96 @@ def allowed_file(filename):
     """Check if file extension is allowed."""
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in {'yaml', 'yml', 'json'}
+
+@app.route('/api/categories')
+def api_categories():
+    """API endpoint to get all categories with metadata."""
+    custom_categories = load_custom_categories()
+    return jsonify(custom_categories)
+
+@app.route('/api/categories/<category_name>', methods=['PUT'])
+def update_category(category_name):
+    """Update a category's metadata."""
+    data = request.get_json()
+    
+    categories_file = Path('data/categories.json')
+    if not categories_file.exists():
+        return jsonify({'error': 'No categories found'}), 404
+    
+    try:
+        with open(categories_file, 'r') as f:
+            categories_data = json.load(f)
+        
+        if category_name not in categories_data:
+            return jsonify({'error': 'Category not found'}), 404
+        
+        # Update category data
+        categories_data[category_name].update({
+            'display_name': data.get('display_name', categories_data[category_name].get('display_name', category_name.title())),
+            'description': data.get('description', categories_data[category_name].get('description', '')),
+            'icon': data.get('icon', categories_data[category_name].get('icon', 'fas fa-folder')),
+            'color': data.get('color', categories_data[category_name].get('color', 'secondary')),
+            'updated_at': datetime.now().isoformat()
+        })
+        
+        with open(categories_file, 'w') as f:
+            json.dump(categories_data, f, indent=2)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Category "{category_name}" updated successfully',
+            'category': categories_data[category_name]
+        })
+    except Exception as e:
+        logger.error(f"Error updating category {category_name}: {e}")
+        return jsonify({'error': 'Failed to update category'}), 500
+
+@app.route('/api/categories/<category_name>', methods=['DELETE'])
+def delete_category(category_name):
+    """Delete a category and move templates to community."""
+    categories_file = Path('data/categories.json')
+    if not categories_file.exists():
+        return jsonify({'error': 'No categories found'}), 404
+    
+    try:
+        with open(categories_file, 'r') as f:
+            categories_data = json.load(f)
+        
+        if category_name not in categories_data:
+            return jsonify({'error': 'Category not found'}), 404
+        
+        # Move templates to community category
+        category_dir = Path('templates') / category_name
+        community_dir = Path('templates') / 'community'
+        community_dir.mkdir(parents=True, exist_ok=True)
+        
+        if category_dir.exists():
+            for template_file in category_dir.iterdir():
+                if template_file.is_file():
+                    # Move file to community directory
+                    new_path = community_dir / template_file.name
+                    template_file.rename(new_path)
+            
+            # Remove empty category directory
+            category_dir.rmdir()
+        
+        # Remove from categories data
+        del categories_data[category_name]
+        
+        with open(categories_file, 'w') as f:
+            json.dump(categories_data, f, indent=2)
+        
+        # Remove from TEMPLATE_DIRS if it exists
+        if category_name in TEMPLATE_DIRS:
+            del TEMPLATE_DIRS[category_name]
+        
+        return jsonify({
+            'success': True,
+            'message': f'Category "{category_name}" deleted successfully. Templates moved to community category.'
+        })
+    except Exception as e:
+        logger.error(f"Error deleting category {category_name}: {e}")
+        return jsonify({'error': 'Failed to delete category'}), 500
 
 @app.route('/test-logos')
 def test_logos():

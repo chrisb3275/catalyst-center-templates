@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize dark mode
     initializeDarkMode();
     
+    // Load dynamic navigation
+    loadDynamicNavigation();
+    
     // Initialize tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -312,10 +315,34 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ctrl/Cmd + K for search
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
-            const searchInput = document.getElementById('searchInput');
+            const searchInput = document.querySelector('input[name="q"]');
             if (searchInput) {
                 searchInput.focus();
             }
+        }
+        
+        // Ctrl/Cmd + N for new category
+        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+            e.preventDefault();
+            window.location.href = '/create-category';
+        }
+        
+        // Ctrl/Cmd + U for upload
+        if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+            e.preventDefault();
+            window.location.href = '/upload';
+        }
+        
+        // Ctrl/Cmd + M for manage categories
+        if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
+            e.preventDefault();
+            window.location.href = '/manage-categories';
+        }
+        
+        // Ctrl/Cmd + H for home
+        if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+            e.preventDefault();
+            window.location.href = '/';
         }
         
         // Escape to close modals
@@ -327,6 +354,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     modal.hide();
                 }
             }
+        }
+        
+        // F1 for help
+        if (e.key === 'F1') {
+            e.preventDefault();
+            showKeyboardShortcuts();
         }
     });
 
@@ -438,4 +471,54 @@ function setTheme(theme) {
         darkModeIcon.className = 'fas fa-moon';
         localStorage.setItem('theme', 'light');
     }
+}
+
+// Dynamic Navigation Functions
+function loadDynamicNavigation() {
+    const dropdownMenu = document.getElementById('templatesDropdownMenu');
+    if (!dropdownMenu) return;
+    
+    // Default categories with their icons and colors
+    const defaultCategories = {
+        'network': { icon: 'fas fa-network-wired', color: 'primary', name: 'Network' },
+        'security': { icon: 'fas fa-shield-alt', color: 'success', name: 'Security' },
+        'automation': { icon: 'fas fa-robot', color: 'warning', name: 'Automation' },
+        'monitoring': { icon: 'fas fa-chart-line', color: 'info', name: 'Monitoring' },
+        'community': { icon: 'fas fa-users', color: 'secondary', name: 'Community' }
+    };
+    
+    // Load custom categories from API
+    fetch('/api/categories')
+        .then(response => response.json())
+        .then(customCategories => {
+            // Merge default and custom categories
+            const allCategories = { ...defaultCategories, ...customCategories };
+            
+            // Clear existing items
+            dropdownMenu.innerHTML = '';
+            
+            // Add category items
+            Object.entries(allCategories).forEach(([key, category]) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a class="dropdown-item" href="/templates/${key}">
+                        <i class="${category.icon} me-2 text-${category.color}"></i>${category.display_name || category.name}
+                    </a>
+                `;
+                dropdownMenu.appendChild(li);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading categories:', error);
+            // Fallback to default categories
+            Object.entries(defaultCategories).forEach(([key, category]) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a class="dropdown-item" href="/templates/${key}">
+                        <i class="${category.icon} me-2 text-${category.color}"></i>${category.name}
+                    </a>
+                `;
+                dropdownMenu.appendChild(li);
+            });
+        });
 }

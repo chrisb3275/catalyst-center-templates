@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories - Automation-X Catalyst Center - AT&T{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Manage Categories</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-cogs me-2 text-primary"></i>Manage Categories</h1>
+                    <p class="text-muted">Edit, delete, and manage your template categories</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('create_category') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Create New Category
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>All Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="categoriesList">
+                        <div class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                            <p class="text-muted mt-2">Loading categories...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Statistics -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-bar me-2"></i>Category Statistics
+                    </h5>
+                    <div class="row" id="categoryStats">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-primary" id="totalCategories">-</h4>
+                                <p class="text-muted mb-0">Total Categories</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-success" id="customCategories">-</h4>
+                                <p class="text-muted mb-0">Custom Categories</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-info" id="totalTemplates">-</h4>
+                                <p class="text-muted mb-0">Total Templates</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-warning" id="avgTemplatesPerCategory">-</h4>
+                                <p class="text-muted mb-0">Avg per Category</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">
+                    <i class="fas fa-edit me-2"></i>Edit Category
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCategoryForm">
+                    <input type="hidden" id="editCategoryName" name="name">
+                    
+                    <div class="mb-3">
+                        <label for="editDisplayName" class="form-label">Display Name</label>
+                        <input type="text" class="form-control" id="editDisplayName" name="display_name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editIcon" class="form-label">Icon</label>
+                                <select class="form-select" id="editIcon" name="icon">
+                                    <option value="fas fa-folder">📁 Folder</option>
+                                    <option value="fas fa-wifi">📶 WiFi</option>
+                                    <option value="fas fa-phone">📞 Phone</option>
+                                    <option value="fas fa-server">🖥️ Server</option>
+                                    <option value="fas fa-database">🗄️ Database</option>
+                                    <option value="fas fa-cloud">☁️ Cloud</option>
+                                    <option value="fas fa-lock">🔒 Security</option>
+                                    <option value="fas fa-cog">⚙️ Settings</option>
+                                    <option value="fas fa-chart-bar">📊 Analytics</option>
+                                    <option value="fas fa-tools">🔧 Tools</option>
+                                    <option value="fas fa-mobile-alt">📱 Mobile</option>
+                                    <option value="fas fa-desktop">🖥️ Desktop</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="editColor" class="form-label">Color Theme</label>
+                                <select class="form-select" id="editColor" name="color">
+                                    <option value="primary">🔵 Primary (Blue)</option>
+                                    <option value="success">🟢 Success (Green)</option>
+                                    <option value="warning">🟡 Warning (Yellow)</option>
+                                    <option value="danger">🔴 Danger (Red)</option>
+                                    <option value="info">🔵 Info (Cyan)</option>
+                                    <option value="secondary">⚫ Secondary (Gray)</option>
+                                    <option value="dark">⚫ Dark (Black)</option>
+                                    <option value="light">⚪ Light (White)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCategoryBtn">
+                    <i class="fas fa-save me-1"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCategoryModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Delete Category
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the category <strong id="deleteCategoryName"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All templates in this category will be moved to the 'community' category.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash me-1"></i>Delete Category
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadCategories();
+    
+    // Edit category form submission
+    document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+        const form = document.getElementById('editCategoryForm');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        const categoryName = document.getElementById('editCategoryName').value;
+        
+        fetch(`/api/categories/${categoryName}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Category updated successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editCategoryModal')).hide();
+                loadCategories();
+            } else {
+                showAlert('Error updating category: ' + data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error updating category: ' + error, 'danger');
+        });
+    });
+    
+    // Delete category confirmation
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        const categoryName = document.getElementById('deleteCategoryName').textContent;
+        
+        fetch(`/api/categories/${categoryName}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Category deleted successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('deleteCategoryModal')).hide();
+                loadCategories();
+            } else {
+                showAlert('Error deleting category: ' + data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error deleting category: ' + error, 'danger');
+        });
+    });
+});
+
+function loadCategories() {
+    const categoriesList = document.getElementById('categoriesList');
+    
+    // Show loading state
+    categoriesList.innerHTML = `
+        <div class="text-center py-4">
+            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+            <p class="text-muted mt-2">Loading categories...</p>
+        </div>
+    `;
+    
+    // Load categories from API
+    fetch('/api/categories')
+        .then(response => response.json())
+        .then(categories => {
+            displayCategories(categories);
+            updateStatistics(categories);
+        })
+        .catch(error => {
+            console.error('Error loading categories:', error);
+            categoriesList.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error loading categories: ${error.message}
+                </div>
+            `;
+        });
+}
+
+function displayCategories(categories) {
+    const categoriesList = document.getElementById('categoriesList');
+    
+    if (Object.keys(categories).length === 0) {
+        categoriesList.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No custom categories found</h4>
+                <p class="text-muted">Create your first custom category to get started.</p>
+                <a href="{{ url_for('create_category') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Create Category
+                </a>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div class="row">';
+    
+    Object.entries(categories).forEach(([key, category]) => {
+        html += `
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="${category.icon} fa-2x text-${category.color} me-3"></i>
+                            <div>
+                                <h6 class="card-title mb-0">${category.display_name || category.name}</h6>
+                                <small class="text-muted">${key}</small>
+                            </div>
+                        </div>
+                        
+                        <p class="card-text text-muted small">${category.description || 'No description provided'}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <small class="text-muted">
+                                Created: ${new Date(category.created_at).toLocaleDateString()}
+                            </small>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" onclick="editCategory('${key}', ${JSON.stringify(category).replace(/"/g, '&quot;')})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteCategory('${key}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    categoriesList.innerHTML = html;
+}
+
+function updateStatistics(categories) {
+    const customCount = Object.keys(categories).length;
+    const totalCount = customCount + 5; // 5 default categories
+    
+    document.getElementById('totalCategories').textContent = totalCount;
+    document.getElementById('customCategories').textContent = customCount;
+    document.getElementById('totalTemplates').textContent = '-'; // Would need API call
+    document.getElementById('avgTemplatesPerCategory').textContent = '-'; // Would need calculation
+}
+
+function editCategory(categoryName, categoryData) {
+    document.getElementById('editCategoryName').value = categoryName;
+    document.getElementById('editDisplayName').value = categoryData.display_name || categoryData.name;
+    document.getElementById('editDescription').value = categoryData.description || '';
+    document.getElementById('editIcon').value = categoryData.icon || 'fas fa-folder';
+    document.getElementById('editColor').value = categoryData.color || 'secondary';
+    
+    const modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+    modal.show();
+}
+
+function deleteCategory(categoryName) {
+    document.getElementById('deleteCategoryName').textContent = categoryName;
+    const modal = new bootstrap.Modal(document.getElementById('deleteCategoryModal'));
+    modal.show();
+}
+
+function showAlert(message, type) {
+    const alertContainer = document.querySelector('.container');
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    alertContainer.insertBefore(alertDiv, alertContainer.firstChild);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

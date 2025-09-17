@@ -42,7 +42,19 @@ def load_json_template(template_path):
     """Load a JSON template file."""
     try:
         with open(template_path, 'r') as file:
-            data = json.load(file)
+            content = file.read().strip()
+            
+            # Skip if file is empty or appears to be corrupted
+            if not content or len(content) < 10:
+                return None
+                
+            # Try to parse as JSON
+            try:
+                data = json.loads(content)
+            except json.JSONDecodeError:
+                # If it's not valid JSON, skip this file
+                logger.warning(f"Skipping non-JSON file: {template_path}")
+                return None
             
             # Handle different JSON structures
             if isinstance(data, list):

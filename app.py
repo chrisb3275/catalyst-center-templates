@@ -459,6 +459,20 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in {'yaml', 'yml', 'json'}
 
+@app.route('/test-logos')
+def test_logos():
+    """Test endpoint to check if logos are accessible."""
+    import os
+    att_path = os.path.join('static', 'images', 'att-logo.svg')
+    cisco_path = os.path.join('static', 'images', 'cisco-logo.svg')
+    
+    return jsonify({
+        'att_exists': os.path.exists(att_path),
+        'cisco_exists': os.path.exists(cisco_path),
+        'att_size': os.path.getsize(att_path) if os.path.exists(att_path) else 0,
+        'cisco_size': os.path.getsize(cisco_path) if os.path.exists(cisco_path) else 0
+    })
+
 @app.route('/health')
 def health_check():
     """Health check endpoint."""

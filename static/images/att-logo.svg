@@ -1,18 +1,12 @@
-<svg width="120" height="30" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg">
+<svg width="80" height="30" viewBox="0 0 80 30" xmlns="http://www.w3.org/2000/svg">
   <!-- AT&T Globe Logo -->
-  <g transform="translate(5, 5)">
-    <!-- Globe circle -->
-    <circle cx="10" cy="10" r="10" fill="#00A8E0" stroke="#0091D4" stroke-width="0.5"/>
-    
-    <!-- Globe lines -->
-    <path d="M 0 10 Q 10 5 20 10" stroke="white" stroke-width="1" fill="none" opacity="0.8"/>
-    <path d="M 0 10 Q 10 15 20 10" stroke="white" stroke-width="1" fill="none" opacity="0.8"/>
-    <ellipse cx="10" cy="10" rx="10" ry="6" fill="none" stroke="white" stroke-width="1" opacity="0.6"/>
-    
-    <!-- AT&T text inside globe -->
-    <text x="10" y="8" font-family="Arial, sans-serif" font-size="6" font-weight="bold" text-anchor="middle" fill="white">AT&T</text>
-  </g>
+  <circle cx="15" cy="15" r="12" fill="#00A8E0" stroke="#0091D4" stroke-width="1"/>
+  
+  <!-- Globe lines -->
+  <path d="M 3 15 Q 15 8 27 15" stroke="white" stroke-width="1.5" fill="none"/>
+  <path d="M 3 15 Q 15 22 27 15" stroke="white" stroke-width="1.5" fill="none"/>
+  <ellipse cx="15" cy="15" rx="12" ry="8" fill="none" stroke="white" stroke-width="1"/>
   
   <!-- AT&T Text -->
-  <text x="45" y="20" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#00A8E0">AT&T</text>
+  <text x="45" y="20" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#00A8E0">AT&T</text>
 </svg>

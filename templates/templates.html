@@ -334,7 +334,7 @@ function showMoveTemplateModal(category, templateName) {
     select.innerHTML = '<option value="">Select destination category...</option>';
     
     // Load available categories
-    fetch(`/api/templates/${category}/${templateName}/move`)
+    fetch(`/api/templates/${category}/${encodeURIComponent(templateName)}/move`)
         .then(response => response.json())
         .then(data => {
             if (data.available_categories) {
@@ -348,6 +348,7 @@ function showMoveTemplateModal(category, templateName) {
         })
         .catch(error => {
             console.error('Error loading categories:', error);
+            console.error('URL:', `/api/templates/${category}/${encodeURIComponent(templateName)}/move`);
             showAlert('Failed to load available categories', 'danger');
         });
     
@@ -386,16 +387,19 @@ document.addEventListener('DOMContentLoaded', function() {
             confirmMoveBtn.disabled = true;
             
             // Make API call
+            const moveData = {
+                template_name: templateName,
+                from_category: fromCategory,
+                to_category: toCategory
+            };
+            console.log('Moving template:', moveData);
+            
             fetch('/api/templates/move', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    template_name: templateName,
-                    from_category: fromCategory,
-                    to_category: toCategory
-                })
+                body: JSON.stringify(moveData)
             })
             .then(response => response.json())
             .then(data => {

@@ -5,7 +5,7 @@ services:
     build: .
     container_name: catalyst-center-templates
     ports:
-      - "5000:5000"
+      - "8080:5000"
     volumes:
       # Mount template directories for persistence
       - ./templates:/app/templates

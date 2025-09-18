@@ -9,8 +9,9 @@ import json
 import yaml
 from datetime import datetime
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 
 # Configure logging
@@ -20,6 +21,44 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Authentication configuration
+AUTH_ENABLED = os.environ.get('AUTH_ENABLED', 'false').lower() == 'true'
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'CXlabs.123')
+ALLOWED_IPS = os.environ.get('ALLOWED_IPS', '').split(',') if os.environ.get('ALLOWED_IPS') else []
+
+# Simple user storage (in production, use a database)
+users = {
+    ADMIN_USERNAME: generate_password_hash(ADMIN_PASSWORD)
+}
+
+def check_auth():
+    """Check if user is authenticated."""
+    if not AUTH_ENABLED:
+        return True
+    return session.get('authenticated', False)
+
+def check_ip_whitelist():
+    """Check if client IP is in allowed list."""
+    if not ALLOWED_IPS or not ALLOWED_IPS[0]:
+        return True
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+    return client_ip in ALLOWED_IPS
+
+def require_auth(f):
+    """Decorator to require authentication."""
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not check_ip_whitelist():
+            return jsonify({'error': 'Access denied from this IP address'}), 403
+        if not check_auth():
+            if request.is_json:
+                return jsonify({'error': 'Authentication required'}), 401
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Template directories
 TEMPLATE_DIRS = {
@@ -176,7 +215,32 @@ def index():
     
     return render_template('index.html', categories=categories)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Login page."""
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username in users and check_password_hash(users[username], password):
+            session['authenticated'] = True
+            session['username'] = username
+            flash('Login successful!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password', 'error')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    """Logout and clear session."""
+    session.clear()
+    flash('You have been logged out', 'info')
+    return redirect(url_for('index'))
+
 @app.route('/templates/<category>')
+@require_auth
 def templates_category(category):
     """Show all templates in a specific category."""
     if category not in TEMPLATE_DIRS:
@@ -240,6 +304,7 @@ def render_template_endpoint():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/templates')
+@require_auth
 def api_templates():
     """API endpoint to get all templates."""
     all_templates = []
@@ -250,6 +315,7 @@ def api_templates():
     return jsonify(all_templates)
 
 @app.route('/api/templates/<category>')
+@require_auth
 def api_templates_category(category):
     """API endpoint to get templates by category."""
     if category not in TEMPLATE_DIRS:
@@ -571,6 +637,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in {'yaml', 'yml', 'json'}
 
 @app.route('/api/categories')
+@require_auth
 def api_categories():
     """API endpoint to get all categories with metadata."""
     custom_categories = load_custom_categories()

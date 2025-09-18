@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.dev
     container_name: catalyst-center-templates-dev
     ports:
-      - "5000:5000"
+      - "8080:5000"
     volumes:
       # Mount source code for hot reloading
       - .:/app

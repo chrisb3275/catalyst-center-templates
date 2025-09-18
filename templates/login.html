@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Automation-X Catalyst Center - AT&T{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-lock me-2"></i>
+                        Secure Access
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <img src="{{ url_for('static', filename='images/att-logo.svg') }}" alt="AT&T" height="40" class="me-2" onerror="this.style.display='none';">
+                        <span class="mx-2 text-muted">×</span>
+                        <img src="{{ url_for('static', filename='images/cisco-logo.svg') }}" alt="Cisco" height="40" class="me-2" onerror="this.style.display='none';">
+                    </div>
+                    
+                    <h5 class="text-center mb-4">Automation-X Catalyst Center</h5>
+                    
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-1"></i>Username
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" required autofocus>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key me-1"></i>Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center text-muted">
+                    <small>
+                        <i class="fas fa-shield-alt me-1"></i>
+                        Secure access to internal template management system
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+</style>
+{% endblock %}

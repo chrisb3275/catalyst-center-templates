@@ -23,7 +23,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
 # Authentication configuration
-AUTH_ENABLED = os.environ.get('AUTH_ENABLED', 'false').lower() == 'true'
+AUTH_ENABLED = os.environ.get('AUTH_ENABLED', 'true').lower() == 'true'
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'CXlabs.123')
 ALLOWED_IPS = os.environ.get('ALLOWED_IPS', '').split(',') if os.environ.get('ALLOWED_IPS') else []
@@ -187,6 +187,7 @@ def render_template_with_params(template, parameters):
         return f"Error rendering template: {str(e)}"
 
 @app.route('/')
+@require_auth
 def index():
     """Home page showing all template categories."""
     categories = {}

@@ -1,12 +1,36 @@
-<svg width="80" height="30" viewBox="0 0 80 30" xmlns="http://www.w3.org/2000/svg">
-  <!-- AT&T Globe Logo -->
-  <circle cx="15" cy="15" r="12" fill="#00A8E0" stroke="#0091D4" stroke-width="1"/>
+<svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- AT&T Official Logo - Based on Brand Guidelines -->
+  <defs>
+    <linearGradient id="attGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00A8E0;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0091D4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0078B4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
   
-  <!-- Globe lines -->
-  <path d="M 3 15 Q 15 8 27 15" stroke="white" stroke-width="1.5" fill="none"/>
-  <path d="M 3 15 Q 15 22 27 15" stroke="white" stroke-width="1.5" fill="none"/>
-  <ellipse cx="15" cy="15" rx="12" ry="8" fill="none" stroke="white" stroke-width="1"/>
+  <!-- AT&T Globe Icon -->
+  <g transform="translate(8, 8)">
+    <!-- Globe background -->
+    <circle cx="12" cy="12" r="11" fill="url(#attGradient)" stroke="#0078B4" stroke-width="0.5"/>
+    
+    <!-- Globe longitude lines -->
+    <path d="M 1 12 Q 12 3 23 12" stroke="white" stroke-width="1.5" fill="none" opacity="0.9"/>
+    <path d="M 1 12 Q 12 21 23 12" stroke="white" stroke-width="1.5" fill="none" opacity="0.9"/>
+    <path d="M 1 12 Q 12 7 23 12" stroke="white" stroke-width="1.2" fill="none" opacity="0.7"/>
+    <path d="M 1 12 Q 12 17 23 12" stroke="white" stroke-width="1.2" fill="none" opacity="0.7"/>
+    
+    <!-- Globe latitude lines -->
+    <ellipse cx="12" cy="12" rx="11" ry="7" fill="none" stroke="white" stroke-width="1.5" opacity="0.9"/>
+    <ellipse cx="12" cy="12" rx="11" ry="4" fill="none" stroke="white" stroke-width="1.2" opacity="0.7"/>
+    <ellipse cx="12" cy="12" rx="11" ry="10" fill="none" stroke="white" stroke-width="1.2" opacity="0.7"/>
+    
+    <!-- Globe highlight -->
+    <ellipse cx="9" cy="9" rx="2" ry="1.5" fill="white" opacity="0.4"/>
+  </g>
   
   <!-- AT&T Text -->
-  <text x="45" y="20" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#00A8E0">AT&T</text>
+  <text x="35" y="28" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="url(#attGradient)">AT&T</text>
+  
+  <!-- Trademark symbol -->
+  <text x="105" y="20" font-family="Arial, sans-serif" font-size="12" fill="#666">®</text>
 </svg>
